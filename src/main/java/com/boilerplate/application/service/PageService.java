@@ -45,6 +45,7 @@ public class PageService {
             }
             existingPage.setSchema(updatedPage.getSchema());
             existingPage.setAccessControl(updatedPage.getAccessControl());
+            existingPage.setIcon(updatedPage.getIcon());
             Page saved = pageRepository.save(existingPage);
             activityLogService.log("UPDATE_PAGE", "Updated page: " + saved.getTitle(), "ADMIN");
             return saved;

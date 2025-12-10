@@ -1,175 +1,347 @@
 <div style="padding: 2rem;">
-    <h2>Page Management</h2>
+    <h2>Settings & Management</h2>
 
-    <!-- Form -->
-    <div class="card" style="margin-bottom: 2rem; max-width: 1000px;">
-        <h3>{{ isEditing ? 'Edit Page' : 'Create New Page' }}</h3>
-        <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
-            <div class="form-group" style="flex: 1;">
-                <label class="form-label">Title</label>
-                <input type="text" class="form-control" [(ngModel)]="currentPage.title" placeholder="Page Title">
+    <!-- Tabs -->
+    <div style="display: flex; gap: 1rem; margin-bottom: 2rem; border-bottom: 1px solid #e2e8f0;">
+        <button class="btn" [style.border-bottom]="activeTab === 'pages' ? '2px solid #2563eb' : 'none'"
+            [style.color]="activeTab === 'pages' ? '#2563eb' : '#64748b'"
+            style="background: none; border-radius: 0; padding: 0.5rem 1rem;"
+            (click)="activeTab = 'pages'">Pages</button>
+        <button class="btn" [style.border-bottom]="activeTab === 'roles' ? '2px solid #2563eb' : 'none'"
+            [style.color]="activeTab === 'roles' ? '#2563eb' : '#64748b'"
+            style="background: none; border-radius: 0; padding: 0.5rem 1rem;"
+            (click)="activeTab = 'roles'">Roles</button>
+        <button class="btn" [style.border-bottom]="activeTab === 'actions' ? '2px solid #2563eb' : 'none'"
+            [style.color]="activeTab === 'actions' ? '#2563eb' : '#64748b'"
+            style="background: none; border-radius: 0; padding: 0.5rem 1rem;"
+            (click)="activeTab = 'actions'">Actions</button>
+        <button class="btn" [style.border-bottom]="activeTab === 'users' ? '2px solid #2563eb' : 'none'"
+            [style.color]="activeTab === 'users' ? '#2563eb' : '#64748b'"
+            style="background: none; border-radius: 0; padding: 0.5rem 1rem;"
+            (click)="activeTab = 'users'">Users</button>
+        <button class="btn" [style.border-bottom]="activeTab === 'logs' ? '2px solid #2563eb' : 'none'"
+            [style.color]="activeTab === 'logs' ? '#2563eb' : '#64748b'"
+            style="background: none; border-radius: 0; padding: 0.5rem 1rem;" (click)="activeTab = 'logs'">Activity
+            Logs</button>
+    </div>
+
+    <!-- PAGES TAB -->
+    <div *ngIf="activeTab === 'pages'">
+        <!-- Form -->
+        <div class="card" style="margin-bottom: 2rem; max-width: 1000px;">
+            <h3>{{ isEditing ? 'Edit Page' : 'Create New Page' }}</h3>
+            <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+                <div class="form-group" style="flex: 1;">
+                    <label class="form-label">Title</label>
+                    <input type="text" class="form-control" [(ngModel)]="currentPage.title" placeholder="Page Title">
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label class="form-label">Slug (Optional)</label>
+                    <input type="text" class="form-control" [(ngModel)]="currentPage.slug" placeholder="e.g. my-page">
+                </div>
             </div>
-            <div class="form-group" style="flex: 1;">
-                <label class="form-label">Slug (Optional)</label>
-                <input type="text" class="form-control" [(ngModel)]="currentPage.slug" placeholder="e.g. my-page">
+
+            <div class="form-group">
+                <label class="form-label">Content</label>
+                <textarea class="form-control" [(ngModel)]="currentPage.content" rows="5"
+                    placeholder="HTML Content supported"></textarea>
             </div>
-        </div>
 
-        <div class="form-group">
-            <label class="form-label">Content</label>
-            <textarea class="form-control" [(ngModel)]="currentPage.content" rows="5"
-                placeholder="HTML Content supported"></textarea>
-        </div>
-
-        <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
-            <div class="form-group" style="flex: 1;">
-                <label class="form-label">Icon (Material Icon Name)</label>
-                <input type="text" class="form-control" [(ngModel)]="currentPage.icon"
-                    placeholder="e.g. article, info, star">
-            </div>
-            <div class="form-group" style="flex: 1;">
-                <label class="form-label">Roles (comma separated)</label>
-                <input type="text" class="form-control" [(ngModel)]="currentPage.roles" placeholder="USER,ADMIN">
-            </div>
-        </div>
-
-        <!-- Schema Builder -->
-        <div class="form-group" style="margin-top: 1.5rem; border-top: 1px solid #e2e8f0; padding-top: 1rem;">
-            <label class="form-label"
-                style="font-weight: 600; font-size: 1rem; margin-bottom: 1rem; display: block;">Data Schema
-                (Fields)</label>
-
-            <div *ngFor="let field of currentSchema; let i = index; trackBy: trackByIndex"
-                style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1rem; padding: 1.5rem; background: #f8fafc; border-radius: 0.5rem; border: 1px solid #e2e8f0;">
-
-                <!-- Row 1: Name and Label -->
-                <div style="display: flex; gap: 1rem;">
-                    <div style="flex: 1;">
-                        <label style="font-size: 0.75rem; color: #64748b; margin-bottom: 0.25rem; display: block;">Field
-                            Name (Key)</label>
-                        <input type="text" class="form-control" [(ngModel)]="field.name" [name]="'fieldName' + i"
-                            [ngModelOptions]="{standalone: true}" placeholder="e.g. user_age">
-                    </div>
-                    <div style="flex: 1;">
-                        <label style="font-size: 0.75rem; color: #64748b; margin-bottom: 0.25rem; display: block;">Label
-                            (Display Name)</label>
-                        <input type="text" class="form-control" [(ngModel)]="field.label" [name]="'fieldLabel' + i"
-                            [ngModelOptions]="{standalone: true}" placeholder="e.g. Age">
+            <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+                <div class="form-group" style="flex: 1;">
+                    <label class="form-label">Icon</label>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <select class="form-control" [(ngModel)]="currentPage.icon">
+                            <option *ngFor="let icon of availableIcons" [value]="icon">{{ icon }}</option>
+                        </select>
+                        <span class="material-icons" style="color: #64748b;">{{ currentPage.icon }}</span>
                     </div>
                 </div>
-
-                <!-- Row 2: Type and Configuration -->
-                <div style="display: flex; gap: 1rem; align-items: flex-end;">
-                    <div style="width: 150px;">
-                        <label
-                            style="font-size: 0.75rem; color: #64748b; margin-bottom: 0.25rem; display: block;">Type</label>
-                        <select class="form-control" [(ngModel)]="field.type" [name]="'fieldType' + i"
-                            [ngModelOptions]="{standalone: true}">
-                            <option *ngFor="let type of fieldTypes" [value]="type">{{ type }}</option>
-                        </select>
-                    </div>
-
-                    <!-- Options for List -->
-                    <div *ngIf="field.type === 'list'" style="flex: 1;">
-                        <label
-                            style="font-size: 0.75rem; color: #64748b; margin-bottom: 0.25rem; display: block;">Options
-                            (comma separated)</label>
-                        <input type="text" class="form-control" [(ngModel)]="field.options" [name]="'fieldOptions' + i"
-                            [ngModelOptions]="{standalone: true}" placeholder="Option 1, Option 2">
-                    </div>
-
-                    <!-- UI Type for Boolean -->
-                    <div *ngIf="field.type === 'boolean'" style="flex: 1;">
-                        <label style="font-size: 0.75rem; color: #64748b; margin-bottom: 0.25rem; display: block;">UI
-                            Type</label>
-                        <select class="form-control" [(ngModel)]="field.uiType" [name]="'fieldUiType' + i"
-                            [ngModelOptions]="{standalone: true}">
-                            <option value="checkbox">Checkbox</option>
-                            <option value="radio">Radio Button</option>
-                        </select>
-                    </div>
-
-                    <div style="margin-left: auto;">
-                        <button class="btn"
-                            style="color: #dc2626; padding: 0.5rem; border: 1px solid #fee2e2; background: #fef2f2;"
-                            (click)="removeField(i)" title="Remove Field">
-                            <span class="material-icons" style="font-size: 1.25rem;">delete</span>
-                        </button>
+                <div class="form-group" style="flex: 1;">
+                    <label class="form-label">Roles (Access)</label>
+                    <div
+                        style="display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 0.5rem; border: 1px solid #cbd5e1; border-radius: 0.375rem; background: white;">
+                        <label *ngFor="let role of availableRoles"
+                            style="display: flex; align-items: center; gap: 0.25rem; font-size: 0.875rem; cursor: pointer;">
+                            <input type="checkbox" [checked]="currentPage.roles?.includes(role)"
+                                (change)="togglePageRole(role)">
+                            {{ role }}
+                        </label>
                     </div>
                 </div>
             </div>
 
-            <button class="btn"
-                style="background: #f1f5f9; color: #475569; margin-top: 0.5rem; width: 100%; border: 1px dashed #cbd5e1;"
-                (click)="addField()">
-                + Add Field
-            </button>
-        </div>
+            <!-- Schema Builder -->
+            <div class="form-group" style="margin-top: 1.5rem; border-top: 1px solid #e2e8f0; padding-top: 1rem;">
+                <label class="form-label"
+                    style="font-weight: 600; font-size: 1rem; margin-bottom: 1rem; display: block;">Data Schema
+                    (Fields)</label>
 
-        <!-- Access Control -->
-        <div class="form-group" style="margin-top: 1.5rem; border-top: 1px solid #e2e8f0; padding-top: 1rem;">
-            <label class="form-label"
-                style="font-weight: 600; font-size: 1rem; margin-bottom: 1rem; display: block;">Access Control
-                (Permissions)</label>
-            <div style="background: #f8fafc; border-radius: 0.5rem; border: 1px solid #e2e8f0; overflow: hidden;">
-                <table style="width: 100%; border-collapse: collapse;">
-                    <thead>
-                        <tr style="background: #f1f5f9; text-align: left;">
-                            <th style="padding: 0.75rem; font-size: 0.875rem; color: #64748b;">Action</th>
-                            <th *ngFor="let role of availableRoles"
-                                style="padding: 0.75rem; font-size: 0.875rem; color: #64748b; text-align: center;">{{
-                                role }}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr *ngFor="let action of ['create', 'read', 'update', 'delete']"
-                            style="border-top: 1px solid #e2e8f0;">
-                            <td style="padding: 0.75rem; font-weight: 500; text-transform: capitalize;">{{ action }}
-                            </td>
-                            <td *ngFor="let role of availableRoles" style="padding: 0.75rem; text-align: center;">
-                                <input type="checkbox" [checked]="currentPermissions[action]?.includes(role)"
-                                    (change)="togglePermission(action, role)">
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div *ngFor="let field of currentSchema; let i = index; trackBy: trackByIndex"
+                    style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1rem; padding: 1.5rem; background: #f8fafc; border-radius: 0.5rem; border: 1px solid #e2e8f0;">
+
+                    <!-- Row 1: Name and Label -->
+                    <div style="display: flex; gap: 1rem;">
+                        <div style="flex: 1;">
+                            <label
+                                style="font-size: 0.75rem; color: #64748b; margin-bottom: 0.25rem; display: block;">Field
+                                Name (Key)</label>
+                            <input type="text" class="form-control" [(ngModel)]="field.name" [name]="'fieldName' + i"
+                                [ngModelOptions]="{standalone: true}" placeholder="e.g. user_age">
+                        </div>
+                        <div style="flex: 1;">
+                            <label
+                                style="font-size: 0.75rem; color: #64748b; margin-bottom: 0.25rem; display: block;">Label
+                                (Display Name)</label>
+                            <input type="text" class="form-control" [(ngModel)]="field.label" [name]="'fieldLabel' + i"
+                                [ngModelOptions]="{standalone: true}" placeholder="e.g. Age">
+                        </div>
+                    </div>
+
+                    <!-- Row 2: Type and Configuration -->
+                    <div style="display: flex; gap: 1rem; align-items: flex-end;">
+                        <div style="width: 150px;">
+                            <label
+                                style="font-size: 0.75rem; color: #64748b; margin-bottom: 0.25rem; display: block;">Type</label>
+                            <select class="form-control" [(ngModel)]="field.type" [name]="'fieldType' + i"
+                                [ngModelOptions]="{standalone: true}">
+                                <option *ngFor="let type of fieldTypes" [value]="type">{{ type }}</option>
+                            </select>
+                        </div>
+
+                        <!-- Options for List -->
+                        <div *ngIf="field.type === 'list'" style="flex: 1;">
+                            <label
+                                style="font-size: 0.75rem; color: #64748b; margin-bottom: 0.25rem; display: block;">Options
+                                (comma separated)</label>
+                            <input type="text" class="form-control" [(ngModel)]="field.options"
+                                [name]="'fieldOptions' + i" [ngModelOptions]="{standalone: true}"
+                                placeholder="Option 1, Option 2">
+                        </div>
+
+                        <!-- UI Type for Boolean -->
+                        <div *ngIf="field.type === 'boolean'" style="flex: 1;">
+                            <label
+                                style="font-size: 0.75rem; color: #64748b; margin-bottom: 0.25rem; display: block;">UI
+                                Type</label>
+                            <select class="form-control" [(ngModel)]="field.uiType" [name]="'fieldUiType' + i"
+                                [ngModelOptions]="{standalone: true}">
+                                <option value="checkbox">Checkbox</option>
+                                <option value="radio">Radio Button</option>
+                            </select>
+                        </div>
+
+                        <div style="margin-left: auto;">
+                            <button class="btn"
+                                style="color: #dc2626; padding: 0.5rem; border: 1px solid #fee2e2; background: #fef2f2;"
+                                (click)="removeField(i)" title="Remove Field">
+                                <span class="material-icons" style="font-size: 1.25rem;">delete</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn"
+                    style="background: #f1f5f9; color: #475569; margin-top: 0.5rem; width: 100%; border: 1px dashed #cbd5e1;"
+                    (click)="addField()">
+                    + Add Field
+                </button>
+            </div>
+
+            <!-- Access Control -->
+            <div class="form-group" style="margin-top: 1.5rem; border-top: 1px solid #e2e8f0; padding-top: 1rem;">
+                <label class="form-label"
+                    style="font-weight: 600; font-size: 1rem; margin-bottom: 1rem; display: block;">Access Control
+                    (Permissions)</label>
+                <div style="background: #f8fafc; border-radius: 0.5rem; border: 1px solid #e2e8f0; overflow: hidden;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background: #f1f5f9; text-align: left;">
+                                <th style="padding: 0.75rem; font-size: 0.875rem; color: #64748b;">Action</th>
+                                <th *ngFor="let role of availableRoles"
+                                    style="padding: 0.75rem; font-size: 0.875rem; color: #64748b; text-align: center;">
+                                    {{ role }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let action of availableActions" style="border-top: 1px solid #e2e8f0;">
+                                <td style="padding: 0.75rem; font-weight: 500; text-transform: capitalize;">{{ action }}
+                                </td>
+                                <td *ngFor="let role of availableRoles" style="padding: 0.75rem; text-align: center;">
+                                    <input type="checkbox" [checked]="currentPermissions[action]?.includes(role)"
+                                        (change)="togglePermission(action, role)">
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div *ngIf="availableActions.length === 0"
+                        style="padding: 1rem; text-align: center; color: #64748b;">
+                        No actions defined. Go to "Actions" tab to create actions.
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                <button class="btn btn-primary" (click)="savePage()">{{ isEditing ? 'Update' : 'Create' }}</button>
+                <button class="btn" style="background: #e2e8f0; color: #1e293b;" (click)="resetForm()"
+                    *ngIf="isEditing">Cancel</button>
             </div>
         </div>
-        <div style="display: flex; gap: 1rem; margin-top: 1rem;">
-            <button class="btn btn-primary" (click)="savePage()">{{ isEditing ? 'Update' : 'Create' }}</button>
-            <button class="btn" style="background: #e2e8f0; color: #1e293b;" (click)="resetForm()"
-                *ngIf="isEditing">Cancel</button>
+
+        <!-- List -->
+        <div class="card" style="max-width: 1000px; margin-bottom: 2rem;">
+            <h3>Existing Pages</h3>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
+                <thead>
+                    <tr style="text-align: left; border-bottom: 1px solid #e2e8f0;">
+                        <th style="padding: 0.75rem;">Title</th>
+                        <th style="padding: 0.75rem;">Slug</th>
+                        <th style="padding: 0.75rem;">Roles</th>
+                        <th style="padding: 0.75rem;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let page of pages" style="border-bottom: 1px solid #f1f5f9;">
+                        <td style="padding: 0.75rem;">{{ page.title }}</td>
+                        <td style="padding: 0.75rem;">{{ page.slug }}</td>
+                        <td style="padding: 0.75rem;">
+                            <span class="badge" style="background: #e0f2fe; color: #0369a1; margin-right: 0.25rem;">{{
+                                page.roles }}</span>
+                        </td>
+                        <td style="padding: 0.75rem;">
+                            <button (click)="editPage(page)"
+                                style="margin-right: 0.5rem; cursor: pointer; color: #2563eb; background: none; border: none;">Edit</button>
+                            <button (click)="deletePage(page.id!)"
+                                style="cursor: pointer; color: #dc2626; background: none; border: none;">Delete</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 
-    <!-- List -->
-    <div class="card">
-        <h3>Existing Pages</h3>
-        <table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
-            <thead>
-                <tr style="text-align: left; border-bottom: 1px solid #e2e8f0;">
-                    <th style="padding: 0.75rem;">Title</th>
-                    <th style="padding: 0.75rem;">Slug</th>
-                    <th style="padding: 0.75rem;">Roles</th>
-                    <th style="padding: 0.75rem;">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let page of pages" style="border-bottom: 1px solid #f1f5f9;">
-                    <td style="padding: 0.75rem;">{{ page.title }}</td>
-                    <td style="padding: 0.75rem;">{{ page.slug }}</td>
-                    <td style="padding: 0.75rem;">
-                        <span class="badge" style="background: #e0f2fe; color: #0369a1; margin-right: 0.25rem;">{{
-                            page.roles }}</span>
-                    </td>
-                    <td style="padding: 0.75rem;">
-                        <button (click)="editPage(page)"
-                            style="margin-right: 0.5rem; cursor: pointer; color: #2563eb; background: none; border: none;">Edit</button>
-                        <button (click)="deletePage(page.id!)"
-                            style="cursor: pointer; color: #dc2626; background: none; border: none;">Delete</button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+    <!-- ROLES TAB -->
+    <div *ngIf="activeTab === 'roles'">
+        <div class="card" style="max-width: 600px; margin-bottom: 2rem;">
+            <h3>Manage Roles</h3>
+            <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+                <input type="text" class="form-control" [(ngModel)]="newRoleName"
+                    placeholder="New Role Name (e.g. EDITOR)">
+                <button class="btn btn-primary" (click)="createRole()">Add Role</button>
+            </div>
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="text-align: left; border-bottom: 1px solid #e2e8f0;">
+                        <th style="padding: 0.75rem;">ID</th>
+                        <th style="padding: 0.75rem;">Name</th>
+                        <th style="padding: 0.75rem;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let role of rolesList" style="border-bottom: 1px solid #f1f5f9;">
+                        <td style="padding: 0.75rem;">{{ role.id }}</td>
+                        <td style="padding: 0.75rem;">{{ role.name }}</td>
+                        <td style="padding: 0.75rem;">
+                            <button (click)="deleteRole(role.id!)"
+                                style="cursor: pointer; color: #dc2626; background: none; border: none;">Delete</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
+
+    <!-- ACTIONS TAB -->
+    <div *ngIf="activeTab === 'actions'">
+        <div class="card" style="max-width: 600px; margin-bottom: 2rem;">
+            <h3>Manage Actions</h3>
+            <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+                <input type="text" class="form-control" [(ngModel)]="newActionName"
+                    placeholder="New Action Name (e.g. APPROVE)">
+                <button class="btn btn-primary" (click)="createAction()">Add Action</button>
+            </div>
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="text-align: left; border-bottom: 1px solid #e2e8f0;">
+                        <th style="padding: 0.75rem;">ID</th>
+                        <th style="padding: 0.75rem;">Name</th>
+                        <th style="padding: 0.75rem;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let action of actionsList" style="border-bottom: 1px solid #f1f5f9;">
+                        <td style="padding: 0.75rem;">{{ action.id }}</td>
+                        <td style="padding: 0.75rem;">{{ action.name }}</td>
+                        <td style="padding: 0.75rem;">
+                            <button (click)="deleteAction(action.id!)"
+                                style="cursor: pointer; color: #dc2626; background: none; border: none;">Delete</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- USERS TAB -->
+    <div *ngIf="activeTab === 'users'">
+        <div class="card" style="max-width: 1000px; margin-bottom: 2rem;">
+            <h3>Manage Users</h3>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
+                <thead>
+                    <tr style="text-align: left; border-bottom: 1px solid #e2e8f0;">
+                        <th style="padding: 0.75rem;">Name</th>
+                        <th style="padding: 0.75rem;">Email</th>
+                        <th style="padding: 0.75rem;">Role</th>
+                        <th style="padding: 0.75rem;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let user of usersList" style="border-bottom: 1px solid #f1f5f9;">
+                        <td style="padding: 0.75rem;">{{ user.firstname }} {{ user.lastname }}</td>
+                        <td style="padding: 0.75rem;">{{ user.email }}</td>
+                        <td style="padding: 0.75rem;">
+                            <select class="form-control" [ngModel]="user.role.name"
+                                (ngModelChange)="updateUserRole(user, $event)"
+                                style="padding: 0.25rem 0.5rem; font-size: 0.875rem;">
+                                <option *ngFor="let role of rolesList" [value]="role.name">{{ role.name }}</option>
+                            </select>
+                        </td>
+                        <td style="padding: 0.75rem;">
+                            <button (click)="deleteUser(user.id!)"
+                                style="cursor: pointer; color: #dc2626; background: none; border: none;">Delete</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ACTIVITY LOGS TAB -->
+    <div *ngIf="activeTab === 'logs'">
+        <div class="card" style="max-width: 1000px; margin-bottom: 2rem;">
+            <h3>Activity Logs</h3>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
+                <thead>
+                    <tr style="text-align: left; border-bottom: 1px solid #e2e8f0;">
+                        <th style="padding: 0.75rem;">Timestamp</th>
+                        <th style="padding: 0.75rem;">Action</th>
+                        <th style="padding: 0.75rem;">User</th>
+                        <th style="padding: 0.75rem;">Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let log of logsList" style="border-bottom: 1px solid #f1f5f9;">
+                        <td style="padding: 0.75rem; font-size: 0.875rem; color: #64748b;">{{ log.timestamp |
+                            date:'short' }}</td>
+                        <td style="padding: 0.75rem;">
+                            <span class="badge" style="background: #f1f5f9; color: #475569;">{{ log.action }}</span>
+                        </td>
+                        <td style="padding: 0.75rem;">{{ log.userEmail }}</td>
+                        <td style="padding: 0.75rem; color: #475569;">{{ log.description }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
 </div>

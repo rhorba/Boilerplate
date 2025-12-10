@@ -24,7 +24,6 @@ export class MenuComponent implements OnInit {
   allMenuItems: MenuItem[] = [
     { label: 'Dashboard', icon: 'dashboard', route: '/dashboard', roles: ['USER', 'ADMIN'] },
     { label: 'Profile', icon: 'person', route: '/profile', roles: ['USER', 'ADMIN'] },
-    { label: 'Admin Panel', icon: 'admin_panel_settings', route: '/admin', roles: ['ADMIN'] },
     { label: 'Settings', icon: 'settings', route: '/settings', roles: ['ADMIN'] },
   ];
 
@@ -68,7 +67,6 @@ export class MenuComponent implements OnInit {
       this.allMenuItems = [
         { label: 'Dashboard', icon: 'dashboard', route: '/dashboard', roles: ['USER', 'ADMIN'] },
         { label: 'Profile', icon: 'person', route: '/profile', roles: ['USER', 'ADMIN'] },
-        { label: 'Admin Panel', icon: 'admin_panel_settings', route: '/admin', roles: ['ADMIN'] },
         { label: 'Settings', icon: 'settings', route: '/settings', roles: ['ADMIN'] },
         ...pageItems
       ];

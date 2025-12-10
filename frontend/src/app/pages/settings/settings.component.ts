@@ -34,6 +34,14 @@ export class SettingsComponent implements OnInit {
   availableActions: string[] = [];
   currentPermissions: { [key: string]: string[] | undefined } = {};
 
+  // Icons
+  availableIcons: string[] = [
+    'article', 'dashboard', 'settings', 'person', 'people', 'security',
+    'lock', 'visibility', 'edit', 'delete', 'add', 'save', 'home',
+    'info', 'help', 'check_circle', 'warning', 'error', 'search',
+    'menu', 'list', 'grid_view', 'table_view', 'analytics', 'assessment'
+  ];
+
   // Roles Management
   rolesList: Role[] = [];
   newRoleName = '';
@@ -188,6 +196,16 @@ export class SettingsComponent implements OnInit {
     } else {
       this.currentPermissions[action] = [...roles, role];
     }
+  }
+
+  togglePageRole(role: string) {
+    let currentRoles = this.currentPage.roles ? this.currentPage.roles.split(',') : [];
+    if (currentRoles.includes(role)) {
+      currentRoles = currentRoles.filter(r => r !== role);
+    } else {
+      currentRoles.push(role);
+    }
+    this.currentPage.roles = currentRoles.join(',');
   }
 
   // --- Role Management ---
