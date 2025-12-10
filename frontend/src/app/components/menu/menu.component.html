@@ -1,0 +1,41 @@
+<div class="layout-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h3>Boilerplate</h3>
+        </div>
+
+        <div class="user-info">
+            <div class="avatar">{{ userEmail?.charAt(0)?.toUpperCase() }}</div>
+            <div class="details">
+                <span class="email">{{ userEmail }}</span>
+                <span class="role">{{ userRole }}</span>
+            </div>
+        </div>
+
+        <nav class="menu">
+            <ul>
+                <li *ngFor="let item of displayedMenuItems">
+                    <a [routerLink]="item.route" routerLinkActive="active">
+                        <span class="material-icons" *ngIf="item.icon">{{ item.icon }}</span>
+                        <span class="label">{{ item.label }}</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="footer">
+            <button class="btn-logout" (click)="logout()">Logout</button>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="content">
+        <header class="topbar">
+            <h2>{{ pageTitle }}</h2>
+        </header>
+        <div class="page-content">
+            <router-outlet></router-outlet>
+        </div>
+    </main>
+</div>

@@ -1,0 +1,135 @@
+<div style="padding: 2rem;">
+    <h2>Admin Panel</h2>
+
+    <!-- Tabs -->
+    <div style="display: flex; gap: 1rem; margin-bottom: 2rem; border-bottom: 1px solid #e2e8f0;">
+        <button class="btn" [style.background]="activeTab === 'users' ? '#e0e7ff' : 'transparent'"
+            [style.color]="activeTab === 'users' ? '#4f46e5' : '#64748b'" (click)="switchTab('users')"
+            style="border-radius: 0.5rem 0.5rem 0 0; padding: 0.75rem 1.5rem;">
+            User Management
+        </button>
+        <button class="btn" [style.background]="activeTab === 'logs' ? '#e0e7ff' : 'transparent'"
+            [style.color]="activeTab === 'logs' ? '#4f46e5' : '#64748b'" (click)="switchTab('logs')"
+            style="border-radius: 0.5rem 0.5rem 0 0; padding: 0.75rem 1.5rem;">
+            Activity Logs
+        </button>
+    </div>
+
+    <!-- User Management Tab -->
+    <div *ngIf="activeTab === 'users'">
+        <!-- Edit Form -->
+        <div class="card" *ngIf="isEditing && currentUser" style="margin-bottom: 2rem;">
+            <h3>Edit User: {{ currentUser.email }}</h3>
+            <div class="form-group">
+                <label class="form-label">First Name</label>
+                <input type="text" class="form-control" [(ngModel)]="currentUser.firstname">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Last Name</label>
+                <input type="text" class="form-control" [(ngModel)]="currentUser.lastname">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" [(ngModel)]="currentUser.email">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Role</label>
+                <select class="form-control" [(ngModel)]="currentUser.role">
+                    <option value="USER">USER</option>
+                    <option value="ADMIN">ADMIN</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">New Password (leave blank to keep current)</label>
+                <div style="position: relative;">
+                    <input [type]="showPassword ? 'text' : 'password'" class="form-control"
+                        [(ngModel)]="currentUser.password" style="padding-right: 2.5rem;"
+                        placeholder="Enter new password to change">
+                    <span class="material-icons" (click)="togglePassword()"
+                        style="position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); cursor: pointer; color: #64748b;">
+                        {{ showPassword ? 'visibility' : 'visibility_off' }}
+                    </span>
+                </div>
+            </div>
+            <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                <button class="btn btn-primary" (click)="saveUser()">Save Changes</button>
+                <button class="btn" style="background: #e2e8f0; color: #1e293b;" (click)="cancelEdit()">Cancel</button>
+            </div>
+        </div>
+
+        <!-- User List -->
+        <div class="card" style="max-width: 100%;">
+            <h3>All Users</h3>
+            <div style="max-height: 400px; overflow-y: auto; margin-top: 1rem;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead style="position: sticky; top: 0; background: white; z-index: 1;">
+                        <tr style="text-align: left; border-bottom: 2px solid #e2e8f0;">
+                            <th style="padding: 0.75rem;">ID</th>
+                            <th style="padding: 0.75rem;">First Name</th>
+                            <th style="padding: 0.75rem;">Last Name</th>
+                            <th style="padding: 0.75rem;">Email</th>
+                            <th style="padding: 0.75rem;">Role</th>
+                            <th style="padding: 0.75rem;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let user of users" style="border-bottom: 1px solid #f1f5f9;">
+                            <td style="padding: 0.75rem;">{{ user.id }}</td>
+                            <td style="padding: 0.75rem;">{{ user.firstname }}</td>
+                            <td style="padding: 0.75rem;">{{ user.lastname }}</td>
+                            <td style="padding: 0.75rem;">{{ user.email }}</td>
+                            <td style="padding: 0.75rem;">
+                                <span class="badge"
+                                    [style.background]="user.role.name === 'ADMIN' ? '#dbeafe' : '#f1f5f9'"
+                                    [style.color]="user.role.name === 'ADMIN' ? '#1e40af' : '#475569'"
+                                    style="padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.875rem;">
+                                    {{ user.role.name }}
+                                </span>
+                            </td>
+                            <td style="padding: 0.75rem;">
+                                <button (click)="editUser(user)"
+                                    style="margin-right: 0.5rem; cursor: pointer; color: #2563eb; background: none; border: none;">Edit</button>
+                                <button (click)="deleteUser(user.id)"
+                                    style="cursor: pointer; color: #dc2626; background: none; border: none;">Delete</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Activity Logs Tab -->
+    <div *ngIf="activeTab === 'logs'">
+        <div class="card" style="max-width: 100%;">
+            <h3>System Activity Logs</h3>
+            <div style="max-height: 500px; overflow-y: auto; margin-top: 1rem;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead style="position: sticky; top: 0; background: white; z-index: 1;">
+                        <tr style="text-align: left; border-bottom: 2px solid #e2e8f0;">
+                            <th style="padding: 0.75rem;">Timestamp</th>
+                            <th style="padding: 0.75rem;">User</th>
+                            <th style="padding: 0.75rem;">Action</th>
+                            <th style="padding: 0.75rem;">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let log of logs" style="border-bottom: 1px solid #f1f5f9;">
+                            <td style="padding: 0.75rem; color: #64748b; font-size: 0.875rem;">
+                                {{ log.timestamp | date:'medium' }}
+                            </td>
+                            <td style="padding: 0.75rem; font-weight: 500;">{{ log.userEmail }}</td>
+                            <td style="padding: 0.75rem;">
+                                <span class="badge" [style.background]="'#f1f5f9'" [style.color]="'#475569'"
+                                    style="padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem; font-weight: 600;">
+                                    {{ log.action }}
+                                </span>
+                            </td>
+                            <td style="padding: 0.75rem;">{{ log.description }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

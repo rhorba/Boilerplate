@@ -1,0 +1,175 @@
+<div style="padding: 2rem;">
+    <h2>Page Management</h2>
+
+    <!-- Form -->
+    <div class="card" style="margin-bottom: 2rem; max-width: 1000px;">
+        <h3>{{ isEditing ? 'Edit Page' : 'Create New Page' }}</h3>
+        <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+            <div class="form-group" style="flex: 1;">
+                <label class="form-label">Title</label>
+                <input type="text" class="form-control" [(ngModel)]="currentPage.title" placeholder="Page Title">
+            </div>
+            <div class="form-group" style="flex: 1;">
+                <label class="form-label">Slug (Optional)</label>
+                <input type="text" class="form-control" [(ngModel)]="currentPage.slug" placeholder="e.g. my-page">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Content</label>
+            <textarea class="form-control" [(ngModel)]="currentPage.content" rows="5"
+                placeholder="HTML Content supported"></textarea>
+        </div>
+
+        <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+            <div class="form-group" style="flex: 1;">
+                <label class="form-label">Icon (Material Icon Name)</label>
+                <input type="text" class="form-control" [(ngModel)]="currentPage.icon"
+                    placeholder="e.g. article, info, star">
+            </div>
+            <div class="form-group" style="flex: 1;">
+                <label class="form-label">Roles (comma separated)</label>
+                <input type="text" class="form-control" [(ngModel)]="currentPage.roles" placeholder="USER,ADMIN">
+            </div>
+        </div>
+
+        <!-- Schema Builder -->
+        <div class="form-group" style="margin-top: 1.5rem; border-top: 1px solid #e2e8f0; padding-top: 1rem;">
+            <label class="form-label"
+                style="font-weight: 600; font-size: 1rem; margin-bottom: 1rem; display: block;">Data Schema
+                (Fields)</label>
+
+            <div *ngFor="let field of currentSchema; let i = index; trackBy: trackByIndex"
+                style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1rem; padding: 1.5rem; background: #f8fafc; border-radius: 0.5rem; border: 1px solid #e2e8f0;">
+
+                <!-- Row 1: Name and Label -->
+                <div style="display: flex; gap: 1rem;">
+                    <div style="flex: 1;">
+                        <label style="font-size: 0.75rem; color: #64748b; margin-bottom: 0.25rem; display: block;">Field
+                            Name (Key)</label>
+                        <input type="text" class="form-control" [(ngModel)]="field.name" [name]="'fieldName' + i"
+                            [ngModelOptions]="{standalone: true}" placeholder="e.g. user_age">
+                    </div>
+                    <div style="flex: 1;">
+                        <label style="font-size: 0.75rem; color: #64748b; margin-bottom: 0.25rem; display: block;">Label
+                            (Display Name)</label>
+                        <input type="text" class="form-control" [(ngModel)]="field.label" [name]="'fieldLabel' + i"
+                            [ngModelOptions]="{standalone: true}" placeholder="e.g. Age">
+                    </div>
+                </div>
+
+                <!-- Row 2: Type and Configuration -->
+                <div style="display: flex; gap: 1rem; align-items: flex-end;">
+                    <div style="width: 150px;">
+                        <label
+                            style="font-size: 0.75rem; color: #64748b; margin-bottom: 0.25rem; display: block;">Type</label>
+                        <select class="form-control" [(ngModel)]="field.type" [name]="'fieldType' + i"
+                            [ngModelOptions]="{standalone: true}">
+                            <option *ngFor="let type of fieldTypes" [value]="type">{{ type }}</option>
+                        </select>
+                    </div>
+
+                    <!-- Options for List -->
+                    <div *ngIf="field.type === 'list'" style="flex: 1;">
+                        <label
+                            style="font-size: 0.75rem; color: #64748b; margin-bottom: 0.25rem; display: block;">Options
+                            (comma separated)</label>
+                        <input type="text" class="form-control" [(ngModel)]="field.options" [name]="'fieldOptions' + i"
+                            [ngModelOptions]="{standalone: true}" placeholder="Option 1, Option 2">
+                    </div>
+
+                    <!-- UI Type for Boolean -->
+                    <div *ngIf="field.type === 'boolean'" style="flex: 1;">
+                        <label style="font-size: 0.75rem; color: #64748b; margin-bottom: 0.25rem; display: block;">UI
+                            Type</label>
+                        <select class="form-control" [(ngModel)]="field.uiType" [name]="'fieldUiType' + i"
+                            [ngModelOptions]="{standalone: true}">
+                            <option value="checkbox">Checkbox</option>
+                            <option value="radio">Radio Button</option>
+                        </select>
+                    </div>
+
+                    <div style="margin-left: auto;">
+                        <button class="btn"
+                            style="color: #dc2626; padding: 0.5rem; border: 1px solid #fee2e2; background: #fef2f2;"
+                            (click)="removeField(i)" title="Remove Field">
+                            <span class="material-icons" style="font-size: 1.25rem;">delete</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn"
+                style="background: #f1f5f9; color: #475569; margin-top: 0.5rem; width: 100%; border: 1px dashed #cbd5e1;"
+                (click)="addField()">
+                + Add Field
+            </button>
+        </div>
+
+        <!-- Access Control -->
+        <div class="form-group" style="margin-top: 1.5rem; border-top: 1px solid #e2e8f0; padding-top: 1rem;">
+            <label class="form-label"
+                style="font-weight: 600; font-size: 1rem; margin-bottom: 1rem; display: block;">Access Control
+                (Permissions)</label>
+            <div style="background: #f8fafc; border-radius: 0.5rem; border: 1px solid #e2e8f0; overflow: hidden;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: #f1f5f9; text-align: left;">
+                            <th style="padding: 0.75rem; font-size: 0.875rem; color: #64748b;">Action</th>
+                            <th *ngFor="let role of availableRoles"
+                                style="padding: 0.75rem; font-size: 0.875rem; color: #64748b; text-align: center;">{{
+                                role }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let action of ['create', 'read', 'update', 'delete']"
+                            style="border-top: 1px solid #e2e8f0;">
+                            <td style="padding: 0.75rem; font-weight: 500; text-transform: capitalize;">{{ action }}
+                            </td>
+                            <td *ngFor="let role of availableRoles" style="padding: 0.75rem; text-align: center;">
+                                <input type="checkbox" [checked]="currentPermissions[action]?.includes(role)"
+                                    (change)="togglePermission(action, role)">
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+            <button class="btn btn-primary" (click)="savePage()">{{ isEditing ? 'Update' : 'Create' }}</button>
+            <button class="btn" style="background: #e2e8f0; color: #1e293b;" (click)="resetForm()"
+                *ngIf="isEditing">Cancel</button>
+        </div>
+    </div>
+
+    <!-- List -->
+    <div class="card">
+        <h3>Existing Pages</h3>
+        <table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
+            <thead>
+                <tr style="text-align: left; border-bottom: 1px solid #e2e8f0;">
+                    <th style="padding: 0.75rem;">Title</th>
+                    <th style="padding: 0.75rem;">Slug</th>
+                    <th style="padding: 0.75rem;">Roles</th>
+                    <th style="padding: 0.75rem;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let page of pages" style="border-bottom: 1px solid #f1f5f9;">
+                    <td style="padding: 0.75rem;">{{ page.title }}</td>
+                    <td style="padding: 0.75rem;">{{ page.slug }}</td>
+                    <td style="padding: 0.75rem;">
+                        <span class="badge" style="background: #e0f2fe; color: #0369a1; margin-right: 0.25rem;">{{
+                            page.roles }}</span>
+                    </td>
+                    <td style="padding: 0.75rem;">
+                        <button (click)="editPage(page)"
+                            style="margin-right: 0.5rem; cursor: pointer; color: #2563eb; background: none; border: none;">Edit</button>
+                        <button (click)="deletePage(page.id!)"
+                            style="cursor: pointer; color: #dc2626; background: none; border: none;">Delete</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

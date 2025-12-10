@@ -1,0 +1,101 @@
+<div style="padding: 2rem;" *ngIf="page">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <h2>{{ page.title }}</h2>
+        <button class="btn btn-primary" *ngIf="schema.length > 0 && !isEditing" (click)="addData()">
+            + Add New Record
+        </button>
+    </div>
+
+    <!-- Static Content -->
+    <div class="card" *ngIf="page.content" style="margin-bottom: 2rem;">
+        <div [innerHTML]="page.content"></div>
+    </div>
+
+    <!-- Dynamic Form -->
+    <div class="card" *ngIf="isEditing" style="margin-bottom: 2rem;">
+        <h3>{{ currentDataId ? 'Edit Record' : 'New Record' }}</h3>
+        <div *ngFor="let field of schema" class="form-group">
+            <label class="form-label">{{ field.label }}</label>
+
+            <!-- Text Input -->
+            <input *ngIf="field.type === 'text'" type="text" class="form-control" [(ngModel)]="currentData[field.name]">
+
+            <!-- Number Input -->
+            <input *ngIf="field.type === 'number'" type="number" class="form-control"
+                [(ngModel)]="currentData[field.name]">
+
+            <!-- Date Input -->
+            <input *ngIf="field.type === 'date'" type="date" class="form-control" [(ngModel)]="currentData[field.name]">
+
+            <!-- List Input (Select) -->
+            <select *ngIf="field.type === 'list'" class="form-control" [(ngModel)]="currentData[field.name]">
+                <option value="" disabled selected>Select an option</option>
+                <option *ngFor="let opt of getOptions(field.options)" [value]="opt">{{ opt }}</option>
+            </select>
+
+            <!-- Boolean Input -->
+            <div *ngIf="field.type === 'boolean'">
+                <!-- Checkbox -->
+                <div *ngIf="!field.uiType || field.uiType === 'checkbox'"
+                    style="display: flex; align-items: center; gap: 0.5rem;">
+                    <input type="checkbox" [(ngModel)]="currentData[field.name]">
+                    <span>Yes</span>
+                </div>
+                <!-- Radio -->
+                <div *ngIf="field.uiType === 'radio'" style="display: flex; gap: 1rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="radio" [name]="field.name" [value]="true" [(ngModel)]="currentData[field.name]">
+                        <span>Yes</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="radio" [name]="field.name" [value]="false" [(ngModel)]="currentData[field.name]">
+                        <span>No</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+            <button class="btn btn-primary" (click)="saveData()">Save</button>
+            <button class="btn" style="background: #e2e8f0; color: #1e293b;" (click)="cancelEdit()">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Dynamic Table -->
+    <div class="card" *ngIf="schema.length > 0 && !isEditing">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="text-align: left; border-bottom: 2px solid #e2e8f0;">
+                    <th *ngFor="let field of schema" style="padding: 0.75rem;">{{ field.label }}</th>
+                    <th style="padding: 0.75rem;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let item of dataList" style="border-bottom: 1px solid #f1f5f9;">
+                    <td *ngFor="let field of schema" style="padding: 0.75rem;">
+                        {{ getParsedData(item.data)[field.name] }}
+                    </td>
+                    <td style="padding: 0.75rem;">
+                        <button (click)="editData(item)"
+                            style="margin-right: 0.5rem; cursor: pointer; color: #2563eb; background: none; border: none;">Edit</button>
+                        <button (click)="deleteData(item.id!)"
+                            style="cursor: pointer; color: #dc2626; background: none; border: none;">Delete</button>
+                    </td>
+                </tr>
+                <tr *ngIf="dataList.length === 0">
+                    <td [attr.colspan]="schema.length + 1" style="padding: 1rem; text-align: center; color: #64748b;">
+                        No records found.
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div style="padding: 2rem;" *ngIf="loading">
+    <p>Loading...</p>
+</div>
+
+<div style="padding: 2rem;" *ngIf="error">
+    <p>{{ error }}</p>
+</div>
