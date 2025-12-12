@@ -4,6 +4,7 @@ import { Role, RoleService } from '../../core/services/role.service';
 import { Action, ActionService } from '../../core/services/action.service';
 import { User, UserService } from '../../core/services/user.service';
 import { ActivityLog, ActivityLogService } from '../../core/services/activity-log.service';
+import { NotificationService } from '../../core/services/notification.service';
 
 @Component({
   selector: 'app-settings',
@@ -52,16 +53,36 @@ export class SettingsComponent implements OnInit {
 
   // User Management
   usersList: User[] = [];
+  filteredUsers: User[] = [];
+  paginatedUsers: User[] = [];
+
+  // Pagination & Filtering
+  userPage = 1;
+  userPageSize = 5;
+  userTotal = 0;
+  userFilter: { firstname: string, lastname: string, email: string, role: string } = { firstname: '', lastname: '', email: '', role: '' };
+  isEditingUser = false;
+  currentUserEdit: User = { email: '', firstname: '', lastname: '' };
+
 
   // Activity Logs
   logsList: ActivityLog[] = [];
+  filteredLogs: ActivityLog[] = [];
+  paginatedLogs: ActivityLog[] = [];
+
+  // Log Pagination & Filtering
+  logPage = 1;
+  logPageSize = 5;
+  logTotal = 0;
+  logFilter: { action: string, email: string } = { action: '', email: '' };
 
   constructor(
     private pageService: PageService,
     private roleService: RoleService,
     private actionService: ActionService,
     private userService: UserService,
-    private logService: ActivityLogService
+    private logService: ActivityLogService,
+    private notificationService: NotificationService
   ) { }
 
   ngOnInit(): void {
@@ -101,16 +122,111 @@ export class SettingsComponent implements OnInit {
 
   loadUsers() {
     this.userService.getAllUsers().subscribe({
-      next: (data) => this.usersList = data,
+      next: (data) => {
+        this.usersList = data.sort((a, b) => (a.id || 0) - (b.id || 0)); // Sort by ID stable
+        this.applyUserFilter();
+      },
       error: (err) => console.error('Failed to load users', err)
     });
   }
 
+  applyUserFilter() {
+    let filtered = this.usersList;
+
+    if (this.userFilter.firstname) {
+      const term = this.userFilter.firstname.toLowerCase();
+      filtered = filtered.filter(u => u.firstname?.toLowerCase().includes(term));
+    }
+
+    if (this.userFilter.lastname) {
+      const term = this.userFilter.lastname.toLowerCase();
+      filtered = filtered.filter(u => u.lastname?.toLowerCase().includes(term));
+    }
+
+    if (this.userFilter.email) {
+      const term = this.userFilter.email.toLowerCase();
+      filtered = filtered.filter(u => u.email.toLowerCase().includes(term));
+    }
+
+    if (this.userFilter.role) {
+      const term = this.userFilter.role.toLowerCase();
+      filtered = filtered.filter(u => u.role?.name.toLowerCase().includes(term));
+    }
+
+    this.filteredUsers = filtered;
+    this.userTotal = filtered.length;
+    this.updateUserPagination();
+  }
+
+  updateUserPagination() {
+    const startIndex = (this.userPage - 1) * this.userPageSize;
+    this.paginatedUsers = this.filteredUsers.slice(startIndex, startIndex + this.userPageSize);
+  }
+
+  changeUserPage(page: number) {
+    this.userPage = page;
+    this.updateUserPagination();
+  }
+
+  get userTotalPages(): number {
+    return Math.ceil(this.userTotal / this.userPageSize);
+  }
+
   loadLogs() {
     this.logService.getAllLogs().subscribe({
-      next: (data) => this.logsList = data,
+      next: (data) => {
+        this.logsList = data.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()); // Sort new to old
+        this.applyLogFilter();
+      },
       error: (err) => console.error('Failed to load logs', err)
     });
+  }
+
+  applyLogFilter() {
+    let filtered = this.logsList;
+
+    if (this.logFilter.action) {
+      const term = this.logFilter.action.toLowerCase();
+      filtered = filtered.filter(l => l.action.toLowerCase().includes(term));
+    }
+
+    if (this.logFilter.email) {
+      const term = this.logFilter.email.toLowerCase();
+      filtered = filtered.filter(l => l.userEmail.toLowerCase().includes(term));
+    }
+
+    this.filteredLogs = filtered;
+    this.logTotal = filtered.length;
+    this.updateLogPagination();
+  }
+
+  updateLogPagination() {
+    const startIndex = (this.logPage - 1) * this.logPageSize;
+    this.paginatedLogs = this.filteredLogs.slice(startIndex, startIndex + this.logPageSize);
+  }
+
+  changeLogPage(page: number) {
+    this.logPage = page;
+    this.updateLogPagination();
+  }
+
+  get logTotalPages(): number {
+    return Math.ceil(this.logTotal / this.logPageSize);
+  }
+
+  clearLogs() {
+    if (confirm('Are you sure you want to clear all activity logs? This action cannot be undone.')) {
+      this.logService.clearLogs().subscribe({
+        next: () => {
+          this.notificationService.success('All logs cleared successfully');
+          this.loadLogs();
+        },
+        error: (err) => {
+          console.error('Failed to clear logs', err);
+          this.notificationService.error('Failed to clear logs');
+        }
+      });
+    }
   }
 
   // --- Page Management ---
@@ -124,11 +240,11 @@ export class SettingsComponent implements OnInit {
         next: () => {
           this.loadPages();
           this.resetForm();
-          alert('Page updated successfully');
+          this.notificationService.success('Page updated successfully');
         },
         error: (err) => {
           console.error('Update failed', err);
-          alert('Failed to update page: ' + (err.error?.message || err.message));
+          this.notificationService.error('Failed to update page: ' + (err.error?.message || err.message));
         }
       });
     } else {
@@ -136,11 +252,11 @@ export class SettingsComponent implements OnInit {
         next: () => {
           this.loadPages();
           this.resetForm();
-          alert('Page created successfully');
+          this.notificationService.success('Page created successfully');
         },
         error: (err) => {
           console.error('Create failed', err);
-          alert('Failed to create page: ' + (err.error?.message || err.message));
+          this.notificationService.error('Failed to create page: ' + (err.error?.message || err.message));
         }
       });
     }
@@ -208,6 +324,11 @@ export class SettingsComponent implements OnInit {
     this.currentPage.roles = currentRoles.join(',');
   }
 
+  hasPageRole(role: string): boolean {
+    if (!this.currentPage.roles) return false;
+    return this.currentPage.roles.split(',').includes(role);
+  }
+
   // --- Role Management ---
 
   createRole() {
@@ -249,10 +370,52 @@ export class SettingsComponent implements OnInit {
     const updatedUser = { ...user, role: role };
     this.userService.updateUser(user.id!, updatedUser).subscribe({
       next: () => {
-        this.loadUsers();
-        alert('User role updated');
+        // Update local list instead of full reload to prevent visual jumping
+        const index = this.usersList.findIndex(u => u.id === user.id);
+        if (index !== -1) {
+          this.usersList[index] = { ...user, role: role };
+          this.applyUserFilter(); // Re-apply filter/sort
+        }
+        this.notificationService.success('User role updated');
       },
-      error: (err) => alert('Failed to update role')
+      error: (err) => this.notificationService.error('Failed to update role')
+    });
+  }
+
+  editUser(user: User) {
+    this.isEditingUser = true;
+    this.currentUserEdit = { ...user };
+    // ensure role is set correctly for comparison
+    if (this.currentUserEdit.role) {
+      const foundRole = this.rolesList.find(r => r.name === this.currentUserEdit.role?.name);
+      if (foundRole) {
+        this.currentUserEdit.role = foundRole;
+      }
+    }
+  }
+
+  cancelUserEdit() {
+    this.isEditingUser = false;
+    this.currentUserEdit = { email: '', firstname: '', lastname: '' };
+  }
+
+  saveUser() {
+    if (!this.currentUserEdit.id) return;
+
+    this.userService.updateUser(this.currentUserEdit.id, this.currentUserEdit).subscribe({
+      next: (updatedUser) => {
+        const index = this.usersList.findIndex(u => u.id === updatedUser.id);
+        if (index !== -1) {
+          this.usersList[index] = updatedUser;
+          this.applyUserFilter();
+        }
+        this.notificationService.success('User updated successfully');
+        this.cancelUserEdit();
+      },
+      error: (err) => {
+        console.error('Update user failed', err);
+        this.notificationService.error('Failed to update user');
+      }
     });
   }
 
@@ -260,5 +423,9 @@ export class SettingsComponent implements OnInit {
     if (confirm('Delete user?')) {
       this.userService.deleteUser(id).subscribe(() => this.loadUsers());
     }
+  }
+
+  compareRoles(r1: Role, r2: Role): boolean {
+    return r1 && r2 ? r1.id === r2.id : r1 === r2;
   }
 }

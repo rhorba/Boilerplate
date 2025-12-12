@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { AuthenticationService } from '../../core/services/authentication.service';
+import { NotificationService } from '../../core/services/notification.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +11,8 @@ export class RoleGuard implements CanActivate {
 
   constructor(
     private authService: AuthenticationService,
-    private router: Router
+    private router: Router,
+    private notificationService: NotificationService
   ) { }
 
   canActivate(
@@ -34,7 +36,8 @@ export class RoleGuard implements CanActivate {
     }
 
     // Role not authorized
-    alert('You do not have permission to view this page');
+    // Role not authorized
+    this.notificationService.error('You do not have permission to view this page');
     this.router.navigate(['/dashboard']);
     return false;
   }

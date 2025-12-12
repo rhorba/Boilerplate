@@ -80,16 +80,16 @@
                             <td style="padding: 0.75rem;">{{ user.email }}</td>
                             <td style="padding: 0.75rem;">
                                 <span class="badge"
-                                    [style.background]="user.role.name === 'ADMIN' ? '#dbeafe' : '#f1f5f9'"
-                                    [style.color]="user.role.name === 'ADMIN' ? '#1e40af' : '#475569'"
+                                    [style.background]="user.role?.name === 'ADMIN' ? '#dbeafe' : '#f1f5f9'"
+                                    [style.color]="user.role?.name === 'ADMIN' ? '#1e40af' : '#475569'"
                                     style="padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.875rem;">
-                                    {{ user.role.name }}
+                                    {{ user.role?.name }}
                                 </span>
                             </td>
                             <td style="padding: 0.75rem;">
                                 <button (click)="editUser(user)"
                                     style="margin-right: 0.5rem; cursor: pointer; color: #2563eb; background: none; border: none;">Edit</button>
-                                <button (click)="deleteUser(user.id)"
+                                <button (click)="deleteUser(user.id!)"
                                     style="cursor: pointer; color: #dc2626; background: none; border: none;">Delete</button>
                             </td>
                         </tr>

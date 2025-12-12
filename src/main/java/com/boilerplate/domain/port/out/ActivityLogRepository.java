@@ -7,4 +7,6 @@ public interface ActivityLogRepository {
     ActivityLog save(ActivityLog log);
 
     List<ActivityLog> findAll();
+
+    void deleteAll();
 }

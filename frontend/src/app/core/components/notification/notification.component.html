@@ -1,0 +1,7 @@
+<div class="notification-container">
+    <div *ngFor="let notification of notifications$ | async" class="notification" [ngClass]="notification.type"
+        (click)="remove(notification.id)">
+        <span class="message">{{ notification.message }}</span>
+        <span class="close">&times;</span>
+    </div>
+</div>

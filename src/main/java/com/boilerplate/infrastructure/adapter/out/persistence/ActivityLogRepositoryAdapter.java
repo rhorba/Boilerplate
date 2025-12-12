@@ -43,4 +43,9 @@ public class ActivityLogRepositoryAdapter implements ActivityLogRepository {
                 .timestamp(entity.getTimestamp())
                 .build();
     }
+
+    @Override
+    public void deleteAll() {
+        repository.deleteAll();
+    }
 }

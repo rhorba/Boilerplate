@@ -88,12 +88,7 @@
             <artifactId>stripe-java</artifactId>
             <version>${stripe.version}</version>
         </dependency>
-        <!-- PayPal SDK (Optional, effectively REST calls usually used, but including checkout-sdk-java for better typing) -->
-        <dependency>
-            <groupId>com.paypal.sdk</groupId>
-            <artifactId>checkout-sdk</artifactId>
-            <version>1.0.0</version>
-        </dependency>
+        <!-- PayPal SDK Removed -->
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

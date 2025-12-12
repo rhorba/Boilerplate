@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 export interface ActivityLog {
-    id: number;
+    id?: number;
     action: string;
     description: string;
     userEmail: string;
@@ -14,12 +15,15 @@ export interface ActivityLog {
     providedIn: 'root'
 })
 export class ActivityLogService {
-
-    private apiUrl = 'http://localhost:8080/api/v1/activity-logs';
+    private apiUrl = `${environment.apiUrl}/activity-logs`;
 
     constructor(private http: HttpClient) { }
 
     getAllLogs(): Observable<ActivityLog[]> {
         return this.http.get<ActivityLog[]>(this.apiUrl);
+    }
+
+    clearLogs(): Observable<void> {
+        return this.http.delete<void>(this.apiUrl);
     }
 }

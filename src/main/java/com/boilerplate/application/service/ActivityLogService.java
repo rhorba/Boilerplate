@@ -27,4 +27,8 @@ public class ActivityLogService {
     public List<ActivityLog> getAllLogs() {
         return repository.findAll();
     }
+
+    public void clearLogs() {
+        repository.deleteAll();
+    }
 }

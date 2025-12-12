@@ -2,6 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { User, UserService } from '../../core/services/user.service';
 import { ActivityLog, ActivityLogService } from '../../core/services/activity-log.service';
 
+interface UserEdit extends User {
+  password?: string;
+}
+
 @Component({
   selector: 'app-admin-panel',
   templateUrl: './admin-panel.component.html',
@@ -12,7 +16,7 @@ export class AdminPanelComponent implements OnInit {
   users: User[] = [];
   logs: ActivityLog[] = [];
   activeTab: 'users' | 'logs' = 'users';
-  currentUser: User | null = null;
+  currentUser: UserEdit | null = null;
   isEditing = false;
   showPassword = false;
 
@@ -53,7 +57,7 @@ export class AdminPanelComponent implements OnInit {
   }
 
   editUser(user: User) {
-    this.currentUser = { ...user, password: '' }; // Clone and clear password
+    this.currentUser = { ...user, password: '' };
     this.isEditing = true;
   }
 
@@ -66,7 +70,7 @@ export class AdminPanelComponent implements OnInit {
   }
 
   saveUser() {
-    if (this.currentUser) {
+    if (this.currentUser && this.currentUser.id) {
       this.userService.updateUser(this.currentUser.id, this.currentUser).subscribe({
         next: () => {
           this.loadUsers();

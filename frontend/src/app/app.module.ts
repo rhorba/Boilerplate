@@ -9,11 +9,8 @@ import { AppComponent } from './app.component';
 import { LoginComponent } from './pages/login/login.component';
 import { RegisterComponent } from './pages/register/register.component';
 import { MenuComponent } from './components/menu/menu.component';
-import { AdminPanelComponent } from './pages/admin-panel/admin-panel.component';
-import { SettingsComponent } from './pages/settings/settings.component';
-import { DashboardComponent } from './pages/dashboard/dashboard.component';
-import { ProfileComponent } from './pages/profile/profile.component';
-import { DynamicPageComponent } from './pages/dynamic-page/dynamic-page.component';
+
+import { NotificationComponent } from './core/components/notification/notification.component';
 
 @NgModule({
   declarations: [
@@ -21,11 +18,7 @@ import { DynamicPageComponent } from './pages/dynamic-page/dynamic-page.componen
     LoginComponent,
     RegisterComponent,
     MenuComponent,
-    AdminPanelComponent,
-    SettingsComponent,
-    DashboardComponent,
-    ProfileComponent,
-    DynamicPageComponent
+    NotificationComponent
   ],
   imports: [
     BrowserModule,

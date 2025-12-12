@@ -3,6 +3,7 @@ package com.boilerplate.application.service;
 import com.boilerplate.domain.model.PageData;
 import com.boilerplate.domain.port.out.PageDataRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,7 +18,8 @@ public class PageDataService {
 
     public PageData createPageData(PageData pageData) {
         PageData saved = pageDataRepository.save(pageData);
-        activityLogService.log("CREATE_PAGE_DATA", "Created data for page ID: " + saved.getPageId(), "ADMIN");
+        String currentUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        activityLogService.log("CREATE_PAGE_DATA", "Created data for page ID: " + saved.getPageId(), currentUserEmail);
         return saved;
     }
 
@@ -33,13 +35,15 @@ public class PageDataService {
         return pageDataRepository.findById(id).map(existing -> {
             existing.setData(updatedData.getData());
             PageData saved = pageDataRepository.save(existing);
-            activityLogService.log("UPDATE_PAGE_DATA", "Updated data ID: " + saved.getId(), "ADMIN");
+            String currentUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+            activityLogService.log("UPDATE_PAGE_DATA", "Updated data ID: " + saved.getId(), currentUserEmail);
             return saved;
         }).orElseThrow(() -> new RuntimeException("Page Data not found"));
     }
 
     public void deletePageData(Long id) {
         pageDataRepository.deleteById(id);
-        activityLogService.log("DELETE_PAGE_DATA", "Deleted data ID: " + id, "ADMIN");
+        String currentUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        activityLogService.log("DELETE_PAGE_DATA", "Deleted data ID: " + id, currentUserEmail);
     }
 }

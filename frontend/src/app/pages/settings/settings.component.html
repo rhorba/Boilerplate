@@ -63,8 +63,7 @@
                         style="display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 0.5rem; border: 1px solid #cbd5e1; border-radius: 0.375rem; background: white;">
                         <label *ngFor="let role of availableRoles"
                             style="display: flex; align-items: center; gap: 0.25rem; font-size: 0.875rem; cursor: pointer;">
-                            <input type="checkbox" [checked]="currentPage.roles?.includes(role)"
-                                (change)="togglePageRole(role)">
+                            <input type="checkbox" [checked]="hasPageRole(role)" (change)="togglePageRole(role)">
                             {{ role }}
                         </label>
                     </div>
@@ -286,6 +285,60 @@
     <div *ngIf="activeTab === 'users'">
         <div class="card" style="max-width: 1000px; margin-bottom: 2rem;">
             <h3>Manage Users</h3>
+
+            <!-- Filters -->
+            <div style="display: flex; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap;">
+                <input type="text" class="form-control" placeholder="Filter by First Name"
+                    [(ngModel)]="userFilter.firstname" (ngModelChange)="applyUserFilter()" style="flex: 1;">
+                <input type="text" class="form-control" placeholder="Filter by Last Name"
+                    [(ngModel)]="userFilter.lastname" (ngModelChange)="applyUserFilter()" style="flex: 1;">
+                <input type="text" class="form-control" placeholder="Filter by Email" [(ngModel)]="userFilter.email"
+                    (ngModelChange)="applyUserFilter()" style="flex: 1;">
+                <select class="form-control" [(ngModel)]="userFilter.role" (ngModelChange)="applyUserFilter()"
+                    style="flex: 1;">
+                    <option value="">All Roles</option>
+                    <option *ngFor="let role of rolesList" [value]="role.name">{{ role.name }}</option>
+                </select>
+            </div>
+
+            <!-- User Edit Form -->
+            <div *ngIf="isEditingUser" class="card"
+                style="margin-bottom: 2rem; background: #f8fafc; border: 1px solid #e2e8f0;">
+                <h4 style="margin-top: 0; margin-bottom: 1rem;">Edit User</h4>
+                <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+                    <div class="form-group" style="flex: 1;">
+                        <label class="form-label">First Name</label>
+                        <input type="text" class="form-control" [(ngModel)]="currentUserEdit.firstname">
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label class="form-label">Last Name</label>
+                        <input type="text" class="form-control" [(ngModel)]="currentUserEdit.lastname">
+                    </div>
+                </div>
+                <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+                    <div class="form-group" style="flex: 1;">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" [(ngModel)]="currentUserEdit.email">
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label class="form-label">Role</label>
+                        <select class="form-control" [(ngModel)]="currentUserEdit.role" [compareWith]="compareRoles">
+                            <option *ngFor="let role of rolesList" [ngValue]="role">{{ role.name }}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label class="form-label">New Password (leave blank to keep current)</label>
+                    <input type="password" class="form-control" [(ngModel)]="currentUserEdit.password"
+                        placeholder="Enter new password">
+                </div>
+                <div style="display: flex; gap: 1rem;">
+                    <button class="btn btn-primary" (click)="saveUser()">Save Changes</button>
+                    <button class="btn" style="background: #e2e8f0; color: #1e293b;"
+                        (click)="cancelUserEdit()">Cancel</button>
+                </div>
+            </div>
+
             <table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
                 <thead>
                     <tr style="text-align: left; border-bottom: 1px solid #e2e8f0;">
@@ -296,30 +349,59 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let user of usersList" style="border-bottom: 1px solid #f1f5f9;">
+                    <tr *ngFor="let user of paginatedUsers" style="border-bottom: 1px solid #f1f5f9;">
                         <td style="padding: 0.75rem;">{{ user.firstname }} {{ user.lastname }}</td>
                         <td style="padding: 0.75rem;">{{ user.email }}</td>
                         <td style="padding: 0.75rem;">
-                            <select class="form-control" [ngModel]="user.role.name"
-                                (ngModelChange)="updateUserRole(user, $event)"
-                                style="padding: 0.25rem 0.5rem; font-size: 0.875rem;">
-                                <option *ngFor="let role of rolesList" [value]="role.name">{{ role.name }}</option>
-                            </select>
+                            <span class="badge" style="background: #e0f2fe; color: #0369a1;">{{ user.role?.name
+                                }}</span>
                         </td>
                         <td style="padding: 0.75rem;">
+                            <button (click)="editUser(user)"
+                                style="margin-right: 0.5rem; cursor: pointer; color: #2563eb; background: none; border: none;">Edit</button>
                             <button (click)="deleteUser(user.id!)"
                                 style="cursor: pointer; color: #dc2626; background: none; border: none;">Delete</button>
                         </td>
                     </tr>
                 </tbody>
             </table>
+
+            <!-- Pagination Controls -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+                <span style="color: #64748b; font-size: 0.875rem;">
+                    Showing {{ userTotal === 0 ? 0 : (userPage - 1) * userPageSize + 1 }} - {{ (userPage * userPageSize)
+                    > userTotal ? userTotal : (userPage * userPageSize) }} of {{ userTotal }} users
+                </span>
+                <div style="display: flex; gap: 0.5rem;">
+                    <button class="btn" [disabled]="userPage === 1" (click)="changeUserPage(userPage - 1)"
+                        style="background: #e2e8f0; color: #1e293b; padding: 0.25rem 0.75rem;">Previous</button>
+
+                    <button class="btn" [disabled]="userPage >= userTotalPages" (click)="changeUserPage(userPage + 1)"
+                        style="background: #e2e8f0; color: #1e293b; padding: 0.25rem 0.75rem;">Next</button>
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- ACTIVITY LOGS TAB -->
     <div *ngIf="activeTab === 'logs'">
         <div class="card" style="max-width: 1000px; margin-bottom: 2rem;">
-            <h3>Activity Logs</h3>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3>Activity Logs</h3>
+                <button class="btn btn-danger" (click)="clearLogs()"
+                    style="background: #ef4444; color: white; padding: 0.5rem 1rem; border: none; border-radius: 4px; cursor: pointer;">
+                    Clear Logs
+                </button>
+            </div>
+
+            <!-- Filters -->
+            <div style="display: flex; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap;">
+                <input type="text" class="form-control" placeholder="Filter by Action" [(ngModel)]="logFilter.action"
+                    (ngModelChange)="applyLogFilter()" style="flex: 1;">
+                <input type="text" class="form-control" placeholder="Filter by User Email" [(ngModel)]="logFilter.email"
+                    (ngModelChange)="applyLogFilter()" style="flex: 1;">
+            </div>
+
             <table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
                 <thead>
                     <tr style="text-align: left; border-bottom: 1px solid #e2e8f0;">
@@ -330,7 +412,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let log of logsList" style="border-bottom: 1px solid #f1f5f9;">
+                    <tr *ngFor="let log of paginatedLogs" style="border-bottom: 1px solid #f1f5f9;">
                         <td style="padding: 0.75rem; font-size: 0.875rem; color: #64748b;">{{ log.timestamp |
                             date:'short' }}</td>
                         <td style="padding: 0.75rem;">
@@ -341,6 +423,21 @@
                     </tr>
                 </tbody>
             </table>
+
+            <!-- Pagination Controls -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+                <span style="color: #64748b; font-size: 0.875rem;">
+                    Showing {{ logTotal === 0 ? 0 : (logPage - 1) * logPageSize + 1 }} - {{ (logPage * logPageSize) >
+                    logTotal ? logTotal : (logPage * logPageSize) }} of {{ logTotal }} logs
+                </span>
+                <div style="display: flex; gap: 0.5rem;">
+                    <button class="btn" [disabled]="logPage === 1" (click)="changeLogPage(logPage - 1)"
+                        style="background: #e2e8f0; color: #1e293b; padding: 0.25rem 0.75rem;">Previous</button>
+
+                    <button class="btn" [disabled]="logPage >= logTotalPages" (click)="changeLogPage(logPage + 1)"
+                        style="background: #e2e8f0; color: #1e293b; padding: 0.25rem 0.75rem;">Next</button>
+                </div>
+            </div>
         </div>
     </div>
 

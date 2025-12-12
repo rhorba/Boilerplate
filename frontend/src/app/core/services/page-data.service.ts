@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 export interface PageData {
     id?: number;
@@ -12,7 +13,7 @@ export interface PageData {
     providedIn: 'root'
 })
 export class PageDataService {
-    private apiUrl = 'http://localhost:8080/api/v1/page-data';
+    private apiUrl = `${environment.apiUrl}/page-data`;
 
     constructor(private http: HttpClient) { }
 

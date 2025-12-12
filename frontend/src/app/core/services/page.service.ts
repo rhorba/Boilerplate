@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, Subject } from 'rxjs';
 import { tap } from 'rxjs/operators';
+import { environment } from '../../../environments/environment';
 
 export interface Page {
   id?: number;
@@ -9,18 +10,16 @@ export interface Page {
   slug: string;
   content: string;
   icon?: string;
-  roles: string; // "USER,ADMIN"
-  schema?: string; // JSON string
-  accessControl?: string; // JSON string
+  roles?: string;
+  schema?: string;
+  accessControl?: string;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class PageService {
-
-  private apiUrl = 'http://localhost:8080/api/v1/pages';
-
+  private apiUrl = `${environment.apiUrl}/pages`;
   private refreshPages$ = new Subject<void>();
 
   get refreshPages() {

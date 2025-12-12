@@ -3,6 +3,7 @@ package com.boilerplate.application.service;
 import com.boilerplate.domain.model.User;
 import com.boilerplate.domain.port.out.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -38,13 +39,15 @@ public class UserService {
             }
 
             User saved = userRepository.save(existingUser);
-            activityLogService.log("UPDATE_USER", "Updated user: " + saved.getEmail(), "ADMIN");
+            String currentUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+            activityLogService.log("UPDATE_USER", "Updated user: " + saved.getEmail(), currentUserEmail);
             return saved;
         }).orElseThrow(() -> new RuntimeException("User not found"));
     }
 
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
-        activityLogService.log("DELETE_USER", "Deleted user ID: " + id, "ADMIN");
+        String currentUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        activityLogService.log("DELETE_USER", "Deleted user ID: " + id, currentUserEmail);
     }
 }

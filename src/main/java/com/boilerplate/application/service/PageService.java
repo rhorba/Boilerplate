@@ -3,6 +3,7 @@ package com.boilerplate.application.service;
 import com.boilerplate.domain.model.Page;
 import com.boilerplate.domain.port.out.PageRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,8 +22,8 @@ public class PageService {
             page.setSlug(page.getTitle().toLowerCase().replace(" ", "-"));
         }
         Page savedPage = pageRepository.save(page);
-        activityLogService.log("CREATE_PAGE", "Created page: " + savedPage.getTitle(), "ADMIN"); // Assuming Admin
-                                                                                                 // context
+        String currentUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        activityLogService.log("CREATE_PAGE", "Created page: " + savedPage.getTitle(), currentUserEmail);
         return savedPage;
     }
 
@@ -47,13 +48,15 @@ public class PageService {
             existingPage.setAccessControl(updatedPage.getAccessControl());
             existingPage.setIcon(updatedPage.getIcon());
             Page saved = pageRepository.save(existingPage);
-            activityLogService.log("UPDATE_PAGE", "Updated page: " + saved.getTitle(), "ADMIN");
+            String currentUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+            activityLogService.log("UPDATE_PAGE", "Updated page: " + saved.getTitle(), currentUserEmail);
             return saved;
         }).orElseThrow(() -> new RuntimeException("Page not found"));
     }
 
     public void deletePage(Long id) {
         pageRepository.deleteById(id);
-        activityLogService.log("DELETE_PAGE", "Deleted page ID: " + id, "ADMIN");
+        String currentUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        activityLogService.log("DELETE_PAGE", "Deleted page ID: " + id, currentUserEmail);
     }
 }
