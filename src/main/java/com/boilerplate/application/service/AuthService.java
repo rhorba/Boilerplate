@@ -21,58 +21,69 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final JwtService jwtService;
-    private final AuthenticationManager authenticationManager;
-    private final UserDetailsService userDetailsService;
-    private final ActivityLogService activityLogService;
-    private final RoleRepository roleRepository;
+        private final UserRepository userRepository;
+        private final PasswordEncoder passwordEncoder;
+        private final JwtService jwtService;
+        private final AuthenticationManager authenticationManager;
+        private final UserDetailsService userDetailsService;
+        private final ActivityLogService activityLogService;
+        private final RoleRepository roleRepository;
 
-    public AuthenticationResponse register(RegisterRequest request) {
-        if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email already exists");
+        public AuthenticationResponse register(RegisterRequest request) {
+                if (userRepository.existsByEmail(request.getEmail())) {
+                        throw new RuntimeException("Email already exists");
+                }
+
+                Role userRole = roleRepository.findByName("USER")
+                                .orElseThrow(() -> new RuntimeException("Default role USER not found"));
+
+                var user = User.builder()
+                                .firstname(request.getFirstname())
+                                .lastname(request.getLastname())
+                                .email(request.getEmail())
+                                .password(passwordEncoder.encode(request.getPassword()))
+                                .role(userRole)
+                                .build();
+
+                userRepository.save(user);
+                activityLogService.log("REGISTER", "New user registered: " + user.getEmail(), user.getEmail());
+
+                // Load UserDetails to generate token (using the UserDetailsService which
+                // usually returns our Entity implementing UserDetails)
+                UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
+                var jwtToken = jwtService.generateToken(userDetails);
+                var refreshToken = jwtService.generateRefreshToken(userDetails);
+                return AuthenticationResponse.builder()
+                                .accessToken(jwtToken)
+                                .refreshToken(refreshToken)
+                                .build();
         }
 
-        Role userRole = roleRepository.findByName("USER")
-                .orElseThrow(() -> new RuntimeException("Default role USER not found"));
+        public AuthenticationResponse authenticate(AuthenticationRequest request) {
+                authenticationManager.authenticate(
+                                new UsernamePasswordAuthenticationToken(
+                                                request.getEmail(),
+                                                request.getPassword()));
+                var userDetails = userDetailsService.loadUserByUsername(request.getEmail());
 
-        var user = User.builder()
-                .firstname(request.getFirstname())
-                .lastname(request.getLastname())
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .role(userRole)
-                .build();
+                activityLogService.log("LOGIN", "User logged in", request.getEmail());
 
-        userRepository.save(user);
-        activityLogService.log("REGISTER", "New user registered: " + user.getEmail(), user.getEmail());
+                var jwtToken = jwtService.generateToken(userDetails);
+                var refreshToken = jwtService.generateRefreshToken(userDetails);
+                return AuthenticationResponse.builder()
+                                .accessToken(jwtToken)
+                                .refreshToken(refreshToken)
+                                .build();
+        }
 
-        // Load UserDetails to generate token (using the UserDetailsService which
-        // usually returns our Entity implementing UserDetails)
-        UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
-        var jwtToken = jwtService.generateToken(userDetails);
-        var refreshToken = jwtService.generateRefreshToken(userDetails);
-        return AuthenticationResponse.builder()
-                .accessToken(jwtToken)
-                .refreshToken(refreshToken)
-                .build();
-    }
-
-    public AuthenticationResponse authenticate(AuthenticationRequest request) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
-                        request.getPassword()));
-        var userDetails = userDetailsService.loadUserByUsername(request.getEmail());
-
-        activityLogService.log("LOGIN", "User logged in", request.getEmail());
-
-        var jwtToken = jwtService.generateToken(userDetails);
-        var refreshToken = jwtService.generateRefreshToken(userDetails);
-        return AuthenticationResponse.builder()
-                .accessToken(jwtToken)
-                .refreshToken(refreshToken)
-                .build();
-    }
+        public User getCurrentUser() {
+                var authentication = org.springframework.security.core.context.SecurityContextHolder.getContext()
+                                .getAuthentication();
+                if (authentication == null || !authentication.isAuthenticated()) {
+                        throw new RuntimeException("User not authenticated");
+                }
+                var email = authentication.getName();
+                return userRepository.findByEmail(email)
+                                .orElseThrow(() -> new RuntimeException("User not found"));
+        }
 }

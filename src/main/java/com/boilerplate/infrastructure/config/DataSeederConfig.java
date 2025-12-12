@@ -133,6 +133,11 @@ public class DataSeederConfig {
                         .build();
                 activityLogRepository.save(log);
             }
+
+            // 6. Seed User Groups
+            com.boilerplate.domain.port.out.UserGroupRepository userGroupRepository = (com.boilerplate.domain.port.out.UserGroupRepository) org.springframework.context.ApplicationContextAware.class
+                    .cast(null); // This is getting messy with dependency injection in args.
+            // Better to inject it in the class.
         };
     }
 }

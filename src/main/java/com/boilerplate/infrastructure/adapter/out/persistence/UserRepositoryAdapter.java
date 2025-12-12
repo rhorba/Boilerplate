@@ -42,6 +42,12 @@ public class UserRepositoryAdapter implements UserRepository {
                         .id(entity.getRole().getId())
                         .name(entity.getRole().getName())
                         .build() : null)
+                .groups(entity.getGroups() != null ? entity.getGroups().stream()
+                        .map(g -> com.boilerplate.domain.model.UserGroup.builder()
+                                .id(g.getId())
+                                .name(g.getName())
+                                .build())
+                        .collect(java.util.stream.Collectors.toList()) : java.util.Collections.emptyList())
                 .build();
     }
 
@@ -73,6 +79,12 @@ public class UserRepositoryAdapter implements UserRepository {
                         .id(user.getRole().getId())
                         .name(user.getRole().getName())
                         .build())
+                .groups(user.getGroups() != null ? user.getGroups().stream()
+                        .map(g -> com.boilerplate.infrastructure.adapter.out.persistence.entity.UserGroupEntity
+                                .builder()
+                                .id(g.getId())
+                                .build())
+                        .collect(java.util.stream.Collectors.toList()) : java.util.Collections.emptyList())
                 .build();
     }
 }

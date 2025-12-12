@@ -23,6 +23,10 @@
             [style.color]="activeTab === 'logs' ? '#2563eb' : '#64748b'"
             style="background: none; border-radius: 0; padding: 0.5rem 1rem;" (click)="activeTab = 'logs'">Activity
             Logs</button>
+        <a class="btn" routerLink="/settings/user-groups"
+            style="background: none; border-radius: 0; padding: 0.5rem 1rem; color: #64748b; text-decoration: none; display: flex; align-items: center;">
+            User Groups <span class="material-icons" style="font-size: 1rem; margin-left: 4px;">open_in_new</span>
+        </a>
     </div>
 
     <!-- PAGES TAB -->
@@ -57,135 +61,142 @@
                         <span class="material-icons" style="color: #64748b;">{{ currentPage.icon }}</span>
                     </div>
                 </div>
-                <div class="form-group" style="flex: 1;">
-                    <label class="form-label">Roles (Access)</label>
-                    <div
-                        style="display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 0.5rem; border: 1px solid #cbd5e1; border-radius: 0.375rem; background: white;">
-                        <label *ngFor="let role of availableRoles"
-                            style="display: flex; align-items: center; gap: 0.25rem; font-size: 0.875rem; cursor: pointer;">
-                            <input type="checkbox" [checked]="hasPageRole(role)" (change)="togglePageRole(role)">
-                            {{ role }}
-                        </label>
-                    </div>
+            </div>
+            <div class="form-group" style="flex: 1;">
+                <label class="form-label">Roles (Access)</label>
+                <div
+                    style="display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 0.5rem; border: 1px solid #cbd5e1; border-radius: 0.375rem; background: white;">
+                    <label *ngFor="let role of availableRoles"
+                        style="display: flex; align-items: center; gap: 0.25rem; font-size: 0.875rem; cursor: pointer;">
+                        <input type="checkbox" [checked]="hasPageRole(role)" (change)="togglePageRole(role)">
+                        {{ role }}
+                    </label>
                 </div>
             </div>
-
-            <!-- Schema Builder -->
-            <div class="form-group" style="margin-top: 1.5rem; border-top: 1px solid #e2e8f0; padding-top: 1rem;">
-                <label class="form-label"
-                    style="font-weight: 600; font-size: 1rem; margin-bottom: 1rem; display: block;">Data Schema
-                    (Fields)</label>
-
-                <div *ngFor="let field of currentSchema; let i = index; trackBy: trackByIndex"
-                    style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1rem; padding: 1.5rem; background: #f8fafc; border-radius: 0.5rem; border: 1px solid #e2e8f0;">
-
-                    <!-- Row 1: Name and Label -->
-                    <div style="display: flex; gap: 1rem;">
-                        <div style="flex: 1;">
-                            <label
-                                style="font-size: 0.75rem; color: #64748b; margin-bottom: 0.25rem; display: block;">Field
-                                Name (Key)</label>
-                            <input type="text" class="form-control" [(ngModel)]="field.name" [name]="'fieldName' + i"
-                                [ngModelOptions]="{standalone: true}" placeholder="e.g. user_age">
-                        </div>
-                        <div style="flex: 1;">
-                            <label
-                                style="font-size: 0.75rem; color: #64748b; margin-bottom: 0.25rem; display: block;">Label
-                                (Display Name)</label>
-                            <input type="text" class="form-control" [(ngModel)]="field.label" [name]="'fieldLabel' + i"
-                                [ngModelOptions]="{standalone: true}" placeholder="e.g. Age">
-                        </div>
-                    </div>
-
-                    <!-- Row 2: Type and Configuration -->
-                    <div style="display: flex; gap: 1rem; align-items: flex-end;">
-                        <div style="width: 150px;">
-                            <label
-                                style="font-size: 0.75rem; color: #64748b; margin-bottom: 0.25rem; display: block;">Type</label>
-                            <select class="form-control" [(ngModel)]="field.type" [name]="'fieldType' + i"
-                                [ngModelOptions]="{standalone: true}">
-                                <option *ngFor="let type of fieldTypes" [value]="type">{{ type }}</option>
-                            </select>
-                        </div>
-
-                        <!-- Options for List -->
-                        <div *ngIf="field.type === 'list'" style="flex: 1;">
-                            <label
-                                style="font-size: 0.75rem; color: #64748b; margin-bottom: 0.25rem; display: block;">Options
-                                (comma separated)</label>
-                            <input type="text" class="form-control" [(ngModel)]="field.options"
-                                [name]="'fieldOptions' + i" [ngModelOptions]="{standalone: true}"
-                                placeholder="Option 1, Option 2">
-                        </div>
-
-                        <!-- UI Type for Boolean -->
-                        <div *ngIf="field.type === 'boolean'" style="flex: 1;">
-                            <label
-                                style="font-size: 0.75rem; color: #64748b; margin-bottom: 0.25rem; display: block;">UI
-                                Type</label>
-                            <select class="form-control" [(ngModel)]="field.uiType" [name]="'fieldUiType' + i"
-                                [ngModelOptions]="{standalone: true}">
-                                <option value="checkbox">Checkbox</option>
-                                <option value="radio">Radio Button</option>
-                            </select>
-                        </div>
-
-                        <div style="margin-left: auto;">
-                            <button class="btn"
-                                style="color: #dc2626; padding: 0.5rem; border: 1px solid #fee2e2; background: #fef2f2;"
-                                (click)="removeField(i)" title="Remove Field">
-                                <span class="material-icons" style="font-size: 1.25rem;">delete</span>
-                            </button>
-                        </div>
-                    </div>
+            <div class="form-group" style="flex: 1;">
+                <label class="form-label">User Groups (Access)</label>
+                <div
+                    style="display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 0.5rem; border: 1px solid #cbd5e1; border-radius: 0.375rem; background: white;">
+                    <label *ngFor="let group of userGroupsList"
+                        style="display: flex; align-items: center; gap: 0.25rem; font-size: 0.875rem; cursor: pointer;">
+                        <input type="checkbox" [checked]="hasPageGroup(group)" (change)="togglePageGroup(group)">
+                        {{ group.name }}
+                    </label>
                 </div>
-
-                <button class="btn"
-                    style="background: #f1f5f9; color: #475569; margin-top: 0.5rem; width: 100%; border: 1px dashed #cbd5e1;"
-                    (click)="addField()">
-                    + Add Field
-                </button>
-            </div>
-
-            <!-- Access Control -->
-            <div class="form-group" style="margin-top: 1.5rem; border-top: 1px solid #e2e8f0; padding-top: 1rem;">
-                <label class="form-label"
-                    style="font-weight: 600; font-size: 1rem; margin-bottom: 1rem; display: block;">Access Control
-                    (Permissions)</label>
-                <div style="background: #f8fafc; border-radius: 0.5rem; border: 1px solid #e2e8f0; overflow: hidden;">
-                    <table style="width: 100%; border-collapse: collapse;">
-                        <thead>
-                            <tr style="background: #f1f5f9; text-align: left;">
-                                <th style="padding: 0.75rem; font-size: 0.875rem; color: #64748b;">Action</th>
-                                <th *ngFor="let role of availableRoles"
-                                    style="padding: 0.75rem; font-size: 0.875rem; color: #64748b; text-align: center;">
-                                    {{ role }}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr *ngFor="let action of availableActions" style="border-top: 1px solid #e2e8f0;">
-                                <td style="padding: 0.75rem; font-weight: 500; text-transform: capitalize;">{{ action }}
-                                </td>
-                                <td *ngFor="let role of availableRoles" style="padding: 0.75rem; text-align: center;">
-                                    <input type="checkbox" [checked]="currentPermissions[action]?.includes(role)"
-                                        (change)="togglePermission(action, role)">
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div *ngIf="availableActions.length === 0"
-                        style="padding: 1rem; text-align: center; color: #64748b;">
-                        No actions defined. Go to "Actions" tab to create actions.
-                    </div>
-                </div>
-            </div>
-
-            <div style="display: flex; gap: 1rem; margin-top: 1rem;">
-                <button class="btn btn-primary" (click)="savePage()">{{ isEditing ? 'Update' : 'Create' }}</button>
-                <button class="btn" style="background: #e2e8f0; color: #1e293b;" (click)="resetForm()"
-                    *ngIf="isEditing">Cancel</button>
             </div>
         </div>
+
+        <!-- Schema Builder -->
+        <div class="form-group" style="margin-top: 1.5rem; border-top: 1px solid #e2e8f0; padding-top: 1rem;">
+            <label class="form-label"
+                style="font-weight: 600; font-size: 1rem; margin-bottom: 1rem; display: block;">Data Schema
+                (Fields)</label>
+
+            <div *ngFor="let field of currentSchema; let i = index; trackBy: trackByIndex"
+                style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1rem; padding: 1.5rem; background: #f8fafc; border-radius: 0.5rem; border: 1px solid #e2e8f0;">
+
+                <!-- Row 1: Name and Label -->
+                <div style="display: flex; gap: 1rem;">
+                    <div style="flex: 1;">
+                        <label style="font-size: 0.75rem; color: #64748b; margin-bottom: 0.25rem; display: block;">Field
+                            Name (Key)</label>
+                        <input type="text" class="form-control" [(ngModel)]="field.name" [name]="'fieldName' + i"
+                            [ngModelOptions]="{standalone: true}" placeholder="e.g. user_age">
+                    </div>
+                    <div style="flex: 1;">
+                        <label style="font-size: 0.75rem; color: #64748b; margin-bottom: 0.25rem; display: block;">Label
+                            (Display Name)</label>
+                        <input type="text" class="form-control" [(ngModel)]="field.label" [name]="'fieldLabel' + i"
+                            [ngModelOptions]="{standalone: true}" placeholder="e.g. Age">
+                    </div>
+                </div>
+
+                <!-- Row 2: Type and Configuration -->
+                <div style="display: flex; gap: 1rem; align-items: flex-end;">
+                    <div style="width: 150px;">
+                        <label
+                            style="font-size: 0.75rem; color: #64748b; margin-bottom: 0.25rem; display: block;">Type</label>
+                        <select class="form-control" [(ngModel)]="field.type" [name]="'fieldType' + i"
+                            [ngModelOptions]="{standalone: true}">
+                            <option *ngFor="let type of fieldTypes" [value]="type">{{ type }}</option>
+                        </select>
+                    </div>
+
+                    <!-- Options for List -->
+                    <div *ngIf="field.type === 'list'" style="flex: 1;">
+                        <label
+                            style="font-size: 0.75rem; color: #64748b; margin-bottom: 0.25rem; display: block;">Options
+                            (comma separated)</label>
+                        <input type="text" class="form-control" [(ngModel)]="field.options" [name]="'fieldOptions' + i"
+                            [ngModelOptions]="{standalone: true}" placeholder="Option 1, Option 2">
+                    </div>
+
+                    <!-- UI Type for Boolean -->
+                    <div *ngIf="field.type === 'boolean'" style="flex: 1;">
+                        <label style="font-size: 0.75rem; color: #64748b; margin-bottom: 0.25rem; display: block;">UI
+                            Type</label>
+                        <select class="form-control" [(ngModel)]="field.uiType" [name]="'fieldUiType' + i"
+                            [ngModelOptions]="{standalone: true}">
+                            <option value="checkbox">Checkbox</option>
+                            <option value="radio">Radio Button</option>
+                        </select>
+                    </div>
+
+                    <div style="margin-left: auto;">
+                        <button class="btn"
+                            style="color: #dc2626; padding: 0.5rem; border: 1px solid #fee2e2; background: #fef2f2;"
+                            (click)="removeField(i)" title="Remove Field">
+                            <span class="material-icons" style="font-size: 1.25rem;">delete</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn"
+                style="background: #f1f5f9; color: #475569; margin-top: 0.5rem; width: 100%; border: 1px dashed #cbd5e1;"
+                (click)="addField()">
+                + Add Field
+            </button>
+        </div>
+
+        <!-- Access Control -->
+        <div class="form-group" style="margin-top: 1.5rem; border-top: 1px solid #e2e8f0; padding-top: 1rem;">
+            <label class="form-label"
+                style="font-weight: 600; font-size: 1rem; margin-bottom: 1rem; display: block;">Access Control
+                (Permissions)</label>
+            <div style="background: #f8fafc; border-radius: 0.5rem; border: 1px solid #e2e8f0; overflow: hidden;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: #f1f5f9; text-align: left;">
+                            <th style="padding: 0.75rem; font-size: 0.875rem; color: #64748b;">Action</th>
+                            <th *ngFor="let role of availableRoles"
+                                style="padding: 0.75rem; font-size: 0.875rem; color: #64748b; text-align: center;">
+                                {{ role }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let action of availableActions" style="border-top: 1px solid #e2e8f0;">
+                            <td style="padding: 0.75rem; font-weight: 500; text-transform: capitalize;">{{ action }}
+                            </td>
+                            <td *ngFor="let role of availableRoles" style="padding: 0.75rem; text-align: center;">
+                                <input type="checkbox" [checked]="currentPermissions[action]?.includes(role)"
+                                    (change)="togglePermission(action, role)">
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div *ngIf="availableActions.length === 0" style="padding: 1rem; text-align: center; color: #64748b;">
+                    No actions defined. Go to "Actions" tab to create actions.
+                </div>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+            <button class="btn btn-primary" (click)="savePage()">{{ isEditing ? 'Update' : 'Create' }}</button>
+            <button class="btn" style="background: #e2e8f0; color: #1e293b;" (click)="resetForm()"
+                *ngIf="isEditing">Cancel</button>
+        </div>
+
 
         <!-- List -->
         <div class="card" style="max-width: 1000px; margin-bottom: 2rem;">
@@ -325,6 +336,17 @@
                         <select class="form-control" [(ngModel)]="currentUserEdit.role" [compareWith]="compareRoles">
                             <option *ngFor="let role of rolesList" [ngValue]="role">{{ role.name }}</option>
                         </select>
+                    </div>
+                </div>
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label class="form-label">User Groups</label>
+                    <div
+                        style="display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 0.5rem; border: 1px solid #cbd5e1; border-radius: 0.375rem; background: white;">
+                        <label *ngFor="let group of userGroupsList"
+                            style="display: flex; align-items: center; gap: 0.25rem; font-size: 0.875rem; cursor: pointer;">
+                            <input type="checkbox" [checked]="hasUserGroup(group)" (change)="toggleUserGroup(group)">
+                            {{ group.name }}
+                        </label>
                     </div>
                 </div>
                 <div class="form-group" style="margin-bottom: 1rem;">

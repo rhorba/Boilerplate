@@ -29,4 +29,9 @@ public class AuthController {
             @RequestBody AuthenticationRequest request) {
         return ResponseEntity.ok(service.authenticate(request));
     }
+
+    @org.springframework.web.bind.annotation.GetMapping("/me")
+    public ResponseEntity<com.boilerplate.domain.model.User> getProfile() {
+        return ResponseEntity.ok(service.getCurrentUser());
+    }
 }

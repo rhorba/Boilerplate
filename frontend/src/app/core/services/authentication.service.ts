@@ -12,6 +12,7 @@ import { environment } from '../../../environments/environment';
 export class AuthenticationService {
 
     private baseUrl = `${environment.apiUrl}/auth`;
+    private currentUser: any = null;
 
     constructor(private http: HttpClient) { }
 
@@ -36,6 +37,7 @@ export class AuthenticationService {
     logout() {
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
+        this.currentUser = null;
     }
 
     isLoggedIn(): boolean {
@@ -54,8 +56,6 @@ export class AuthenticationService {
             const decoded: any = jwtDecode(token);
             // Spring Security authorities are often in "authorities" array or "role" claim
             // Adjust based on your JWT payload.
-            // Assuming boilerplate puts role in 'role' or authority in 'sub' is just email
-            // Let's assume standard 'role' claim or check how we built it in backend
             return decoded.role || (decoded.authorities && decoded.authorities[0]) || 'USER';
         } catch (e) {
             return null;
@@ -71,5 +71,15 @@ export class AuthenticationService {
         } catch (e) {
             return null;
         }
+    }
+
+    getCurrentUser(): any | null {
+        return this.currentUser;
+    }
+
+    fetchProfile(): Observable<any> {
+        return this.http.get<any>(`${this.baseUrl}/me`).pipe(
+            tap(user => this.currentUser = user)
+        );
     }
 }

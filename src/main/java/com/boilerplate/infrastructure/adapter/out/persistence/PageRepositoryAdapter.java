@@ -56,6 +56,15 @@ public class PageRepositoryAdapter implements PageRepository {
                 .roles(page.getRoles())
                 .schema(page.getSchema())
                 .accessControl(page.getAccessControl())
+                .groups(page.getGroups() != null ? page.getGroups().stream()
+                        .map(g -> com.boilerplate.infrastructure.adapter.out.persistence.entity.UserGroupEntity
+                                .builder()
+                                .id(g.getId())
+                                .name(g.getName())
+                                .description(g.getDescription())
+                                // We avoid mapping users/pages recursively to prevent infinite loops
+                                .build())
+                        .collect(Collectors.toList()) : null)
                 .build();
     }
 
@@ -69,6 +78,13 @@ public class PageRepositoryAdapter implements PageRepository {
                 .roles(entity.getRoles())
                 .schema(entity.getSchema())
                 .accessControl(entity.getAccessControl())
+                .groups(entity.getGroups() != null ? entity.getGroups().stream()
+                        .map(g -> com.boilerplate.domain.model.UserGroup.builder()
+                                .id(g.getId())
+                                .name(g.getName())
+                                .description(g.getDescription())
+                                .build())
+                        .collect(Collectors.toList()) : java.util.Collections.emptyList())
                 .build();
     }
 }

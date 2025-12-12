@@ -1,10 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { User, UserService } from '../../core/services/user.service';
+import { UserService } from '../../core/services/user.service';
+import { User } from '../../core/models/user.model';
 import { ActivityLog, ActivityLogService } from '../../core/services/activity-log.service';
-
-interface UserEdit extends User {
-  password?: string;
-}
 
 @Component({
   selector: 'app-admin-panel',
@@ -16,7 +13,7 @@ export class AdminPanelComponent implements OnInit {
   users: User[] = [];
   logs: ActivityLog[] = [];
   activeTab: 'users' | 'logs' = 'users';
-  currentUser: UserEdit | null = null;
+  currentUser: User | null = null;
   isEditing = false;
   showPassword = false;
 

@@ -34,4 +34,7 @@ public class PageEntity {
 
     @Column(columnDefinition = "TEXT")
     private String accessControl;
+
+    @ManyToMany(mappedBy = "pages")
+    private java.util.List<UserGroupEntity> groups;
 }

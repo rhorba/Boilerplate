@@ -17,7 +17,7 @@
 		<java.version>17</java.version>
 		<jjwt.version>0.11.5</jjwt.version>
 		<springdoc.version>2.2.0</springdoc.version>
-        <stripe.version>24.3.0</stripe.version>
+
 	</properties>
 	<dependencies>
 		<dependency>
@@ -83,11 +83,7 @@
         </dependency>
 
         <!-- Payments -->
-        <dependency>
-            <groupId>com.stripe</groupId>
-            <artifactId>stripe-java</artifactId>
-            <version>${stripe.version}</version>
-        </dependency>
+
         <!-- PayPal SDK Removed -->
 
 		<dependency>

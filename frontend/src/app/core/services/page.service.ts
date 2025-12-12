@@ -3,17 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, Subject } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
-
-export interface Page {
-  id?: number;
-  title: string;
-  slug: string;
-  content: string;
-  icon?: string;
-  roles?: string;
-  schema?: string;
-  accessControl?: string;
-}
+import { Page } from '../models/page.model';
 
 @Injectable({
   providedIn: 'root'

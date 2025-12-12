@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Page, PageService } from '../../core/services/page.service';
+import { PageService } from '../../core/services/page.service';
+import { Page } from '../../core/models/page.model';
 import { AuthenticationService } from '../../core/services/authentication.service';
 import { PageData, PageDataService } from '../../core/services/page-data.service';
 

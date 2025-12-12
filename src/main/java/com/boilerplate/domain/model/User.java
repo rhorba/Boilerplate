@@ -17,4 +17,5 @@ public class User {
     @com.fasterxml.jackson.annotation.JsonProperty(access = com.fasterxml.jackson.annotation.JsonProperty.Access.WRITE_ONLY)
     private String password;
     private Role role;
+    private java.util.List<UserGroup> groups;
 }

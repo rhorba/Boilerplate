@@ -1,80 +1,75 @@
 import { Component, OnInit } from '@angular/core';
-import { Page, PageService } from '../../core/services/page.service';
-import { Role, RoleService } from '../../core/services/role.service';
+import { PageService } from '../../core/services/page.service';
+import { Page } from '../../core/models/page.model';
+import { RoleService } from '../../core/services/role.service';
 import { Action, ActionService } from '../../core/services/action.service';
-import { User, UserService } from '../../core/services/user.service';
+import { UserService } from '../../core/services/user.service';
 import { ActivityLog, ActivityLogService } from '../../core/services/activity-log.service';
 import { NotificationService } from '../../core/services/notification.service';
-
+import { UserGroup } from '../../core/models/user-group.model';
+import { UserGroupService } from '../../core/services/user-group.service';
+import { User } from '../../core/models/user.model';
+import { Role } from '../../core/models/role.model';
 @Component({
   selector: 'app-settings',
   templateUrl: './settings.component.html',
-  styleUrls: ['./settings.component.scss']
+  styleUrls: ['./settings.component.css']
 })
 export class SettingsComponent implements OnInit {
 
-  activeTab: 'pages' | 'roles' | 'actions' | 'users' | 'logs' = 'pages';
+  // ... 
 
-  // Pages
+  activeTab = 'pages';
+  availableIcons = ['article', 'home', 'settings', 'person', 'lock', 'info', 'dashboard', 'check_circle', 'warning', 'error'];
+  fieldTypes = ['text', 'number', 'email', 'textarea', 'date', 'list', 'boolean'];
+
+  // Page Management
   pages: Page[] = [];
   currentPage: Page = {
     title: '',
     slug: '',
     content: '',
     icon: 'article',
-    roles: 'USER,ADMIN'
+    roles: 'USER,ADMIN',
+    schema: '[]',
+    accessControl: '{}'
   };
+  currentSchema: any[] = [];
+  currentPermissions: any = {};
   isEditing = false;
 
-  // Schema Builder
-  currentSchema: { name: string, type: string, label: string, options?: string, uiType?: string }[] = [];
-  fieldTypes = ['text', 'number', 'date', 'boolean', 'list'];
-
-  // Access Control
-  availableRoles: string[] = [];
-  availableActions: string[] = [];
-  currentPermissions: { [key: string]: string[] | undefined } = {};
-
-  // Icons
-  availableIcons: string[] = [
-    'article', 'dashboard', 'settings', 'person', 'people', 'security',
-    'lock', 'visibility', 'edit', 'delete', 'add', 'save', 'home',
-    'info', 'help', 'check_circle', 'warning', 'error', 'search',
-    'menu', 'list', 'grid_view', 'table_view', 'analytics', 'assessment'
-  ];
-
-  // Roles Management
+  // Role & Action Management
   rolesList: Role[] = [];
+  availableRoles: string[] = [];
   newRoleName = '';
 
-  // Actions Management
   actionsList: Action[] = [];
+  availableActions: string[] = [];
   newActionName = '';
 
   // User Management
   usersList: User[] = [];
   filteredUsers: User[] = [];
   paginatedUsers: User[] = [];
-
-  // Pagination & Filtering
+  userFilter: any = { firstname: '', lastname: '', email: '', role: '' };
   userPage = 1;
-  userPageSize = 5;
+  userPageSize = 10;
   userTotal = 0;
-  userFilter: { firstname: string, lastname: string, email: string, role: string } = { firstname: '', lastname: '', email: '', role: '' };
+
   isEditingUser = false;
   currentUserEdit: User = { email: '', firstname: '', lastname: '' };
 
-
-  // Activity Logs
+  // Logs
   logsList: ActivityLog[] = [];
   filteredLogs: ActivityLog[] = [];
   paginatedLogs: ActivityLog[] = [];
-
-  // Log Pagination & Filtering
+  logFilter: any = { action: '', email: '' };
   logPage = 1;
-  logPageSize = 5;
+  logPageSize = 10;
   logTotal = 0;
-  logFilter: { action: string, email: string } = { action: '', email: '' };
+
+  // User Groups
+  userGroupsList: UserGroup[] = [];
 
   constructor(
     private pageService: PageService,
@@ -82,7 +77,8 @@ export class SettingsComponent implements OnInit {
     private actionService: ActionService,
     private userService: UserService,
     private logService: ActivityLogService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private userGroupService: UserGroupService
   ) { }
 
   ngOnInit(): void {
@@ -91,7 +87,19 @@ export class SettingsComponent implements OnInit {
     this.loadActions();
     this.loadUsers();
     this.loadLogs();
+    this.loadUserGroups();
   }
+
+  loadUserGroups() {
+    this.userGroupService.getAllGroups().subscribe({
+      next: (data) => this.userGroupsList = data,
+      error: (err) => console.error('Failed to load user groups', err)
+    });
+  }
+
+  // ...
+
+
 
   loadPages() {
     this.pageService.getAllPages().subscribe({
@@ -306,9 +314,9 @@ export class SettingsComponent implements OnInit {
   }
 
   togglePermission(action: string, role: string) {
-    const roles = this.currentPermissions[action] || [];
+    const roles: string[] = this.currentPermissions[action] || [];
     if (roles.includes(role)) {
-      this.currentPermissions[action] = roles.filter(r => r !== role);
+      this.currentPermissions[action] = roles.filter((r: string) => r !== role);
     } else {
       this.currentPermissions[action] = [...roles, role];
     }
@@ -329,11 +337,27 @@ export class SettingsComponent implements OnInit {
     return this.currentPage.roles.split(',').includes(role);
   }
 
+  togglePageGroup(group: UserGroup) {
+    if (!this.currentPage.groups) this.currentPage.groups = [];
+    const index = this.currentPage.groups.findIndex(g => g.id === group.id);
+    if (index === -1) {
+      this.currentPage.groups.push(group);
+    } else {
+      this.currentPage.groups.splice(index, 1);
+    }
+  }
+
+  hasPageGroup(group: UserGroup): boolean {
+    if (!this.currentPage.groups) return false;
+    return this.currentPage.groups.some(g => g.id === group.id);
+  }
+
   // --- Role Management ---
 
   createRole() {
     if (!this.newRoleName.trim()) return;
-    this.roleService.createRole({ name: this.newRoleName }).subscribe(() => {
+    const newRole = { name: this.newRoleName } as Role;
+    this.roleService.createRole(newRole).subscribe(() => {
       this.newRoleName = '';
       this.loadRoles();
     });
@@ -427,5 +451,22 @@ export class SettingsComponent implements OnInit {
 
   compareRoles(r1: Role, r2: Role): boolean {
     return r1 && r2 ? r1.id === r2.id : r1 === r2;
+  }
+
+  toggleUserGroup(group: UserGroup) {
+    if (!this.currentUserEdit) return;
+    if (!this.currentUserEdit.groups) this.currentUserEdit.groups = [];
+
+    const index = this.currentUserEdit.groups.findIndex(g => g.id === group.id);
+    if (index === -1) {
+      this.currentUserEdit.groups.push(group);
+    } else {
+      this.currentUserEdit.groups.splice(index, 1);
+    }
+  }
+
+  hasUserGroup(group: UserGroup): boolean {
+    if (!this.currentUserEdit || !this.currentUserEdit.groups) return false;
+    return this.currentUserEdit.groups.some(g => g.id === group.id);
   }
 }

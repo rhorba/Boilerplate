@@ -20,6 +20,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.FetchType;
 
 @Data
 @Builder
@@ -40,6 +43,10 @@ public class UserEntity implements UserDetails {
     @ManyToOne
     @JoinColumn(name = "role_id")
     private RoleEntity role;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "user_group_members", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "group_id"))
+    private List<UserGroupEntity> groups;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
