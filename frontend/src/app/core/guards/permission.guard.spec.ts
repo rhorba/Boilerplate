@@ -1,5 +1,4 @@
 import { TestBed } from '@angular/core/testing';
-import { RouterAuthService } from '@angular/router/testing'; // Deprecated but often used, or use RouterTestingModule
 import { RouterTestingModule } from '@angular/router/testing';
 import { Router, ActivatedRouteSnapshot } from '@angular/router';
 import { HttpClientTestingModule } from '@angular/common/http/testing';

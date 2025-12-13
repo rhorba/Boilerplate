@@ -45,7 +45,7 @@ export class PermissionGuard implements CanActivate {
                 this.handleUnauthorized();
                 return false;
             }
-            const hasGroup = user.groups.some(ug => requiredGroups.includes(ug.name));
+            const hasGroup = user.groups.some((ug: UserGroup) => requiredGroups.includes(ug.name));
             if (hasGroup) return true;
             this.handleUnauthorized();
             return false;
