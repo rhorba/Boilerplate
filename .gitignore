@@ -10,3 +10,9 @@ target/
 .project
 .settings/
 bin/
+
+# Temporary logs and test results
+*.txt
+!LICENSE.txt
+!NOTICE.txt
+
