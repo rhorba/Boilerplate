@@ -15,7 +15,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 @Service
-public class JwtService {
+public class JwtService implements com.boilerplate.application.port.out.TokenProviderPort {
 
     @Value("${security.jwt.secret-key}")
     private String secretKey;

@@ -7,7 +7,9 @@ import com.boilerplate.domain.model.Role;
 import com.boilerplate.domain.model.User;
 import com.boilerplate.domain.port.out.RoleRepository;
 import com.boilerplate.domain.port.out.UserRepository;
-import com.boilerplate.infrastructure.config.JwtService;
+import com.boilerplate.application.port.out.TokenProviderPort;
+import com.boilerplate.domain.exception.RoleNotFoundException;
+import com.boilerplate.domain.exception.UserAlreadyExistsException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -36,7 +38,7 @@ class AuthServiceTest {
     @Mock
     private PasswordEncoder passwordEncoder;
     @Mock
-    private JwtService jwtService;
+    private TokenProviderPort tokenProvider;
     @Mock
     private AuthenticationManager authenticationManager;
     @Mock
@@ -66,8 +68,8 @@ class AuthServiceTest {
 
         UserDetails userDetails = mock(UserDetails.class);
         when(userDetailsService.loadUserByUsername(request.getEmail())).thenReturn(userDetails);
-        when(jwtService.generateToken(userDetails)).thenReturn("accessToken");
-        when(jwtService.generateRefreshToken(userDetails)).thenReturn("refreshToken");
+        when(tokenProvider.generateToken(userDetails)).thenReturn("accessToken");
+        when(tokenProvider.generateRefreshToken(userDetails)).thenReturn("refreshToken");
 
         // Act
         AuthenticationResponse response = authService.register(request);
@@ -87,7 +89,7 @@ class AuthServiceTest {
         when(userRepository.existsByEmail(request.getEmail())).thenReturn(true);
 
         // Act & Assert
-        assertThrows(RuntimeException.class, () -> authService.register(request));
+        assertThrows(UserAlreadyExistsException.class, () -> authService.register(request));
         verify(userRepository, never()).save(any(User.class));
     }
 
@@ -103,7 +105,7 @@ class AuthServiceTest {
         when(roleRepository.findByName("USER")).thenReturn(Optional.empty());
 
         // Act & Assert
-        assertThrows(RuntimeException.class, () -> authService.register(request));
+        assertThrows(RoleNotFoundException.class, () -> authService.register(request));
     }
 
     @Test
@@ -116,8 +118,8 @@ class AuthServiceTest {
 
         UserDetails userDetails = mock(UserDetails.class);
         when(userDetailsService.loadUserByUsername(request.getEmail())).thenReturn(userDetails);
-        when(jwtService.generateToken(userDetails)).thenReturn("accessToken");
-        when(jwtService.generateRefreshToken(userDetails)).thenReturn("refreshToken");
+        when(tokenProvider.generateToken(userDetails)).thenReturn("accessToken");
+        when(tokenProvider.generateRefreshToken(userDetails)).thenReturn("refreshToken");
 
         // Act
         AuthenticationResponse response = authService.authenticate(request);

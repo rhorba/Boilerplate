@@ -3,12 +3,13 @@ package com.boilerplate.application.service;
 import com.boilerplate.application.dto.AuthenticationRequest;
 import com.boilerplate.application.dto.AuthenticationResponse;
 import com.boilerplate.application.dto.RegisterRequest;
+import com.boilerplate.domain.exception.RoleNotFoundException;
+import com.boilerplate.domain.exception.UserAlreadyExistsException;
 import com.boilerplate.domain.model.Role;
 import com.boilerplate.domain.model.User;
+import com.boilerplate.application.port.out.TokenProviderPort;
 import com.boilerplate.domain.port.out.RoleRepository;
 import com.boilerplate.domain.port.out.UserRepository;
-import com.boilerplate.infrastructure.config.JwtService;
-import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,9 +22,11 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AuthService {
 
+        private static final String DEFAULT_ROLE = "USER";
+
         private final UserRepository userRepository;
         private final PasswordEncoder passwordEncoder;
-        private final JwtService jwtService;
+        private final TokenProviderPort tokenProvider;
         private final AuthenticationManager authenticationManager;
         private final UserDetailsService userDetailsService;
         private final ActivityLogService activityLogService;
@@ -31,11 +34,12 @@ public class AuthService {
 
         public AuthenticationResponse register(RegisterRequest request) {
                 if (userRepository.existsByEmail(request.getEmail())) {
-                        throw new RuntimeException("Email already exists");
+                        throw new UserAlreadyExistsException("Email already exists");
                 }
 
-                Role userRole = roleRepository.findByName("USER")
-                                .orElseThrow(() -> new RuntimeException("Default role USER not found"));
+                Role userRole = roleRepository.findByName(DEFAULT_ROLE)
+                                .orElseThrow(() -> new RoleNotFoundException(
+                                                "Default role " + DEFAULT_ROLE + " not found"));
 
                 var user = User.builder()
                                 .firstname(request.getFirstname())
@@ -51,8 +55,8 @@ public class AuthService {
                 // Load UserDetails to generate token (using the UserDetailsService which
                 // usually returns our Entity implementing UserDetails)
                 UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
-                var jwtToken = jwtService.generateToken(userDetails);
-                var refreshToken = jwtService.generateRefreshToken(userDetails);
+                var jwtToken = tokenProvider.generateToken(userDetails);
+                var refreshToken = tokenProvider.generateRefreshToken(userDetails);
                 return AuthenticationResponse.builder()
                                 .accessToken(jwtToken)
                                 .refreshToken(refreshToken)
@@ -68,8 +72,8 @@ public class AuthService {
 
                 activityLogService.log("LOGIN", "User logged in", request.getEmail());
 
-                var jwtToken = jwtService.generateToken(userDetails);
-                var refreshToken = jwtService.generateRefreshToken(userDetails);
+                var jwtToken = tokenProvider.generateToken(userDetails);
+                var refreshToken = tokenProvider.generateRefreshToken(userDetails);
                 return AuthenticationResponse.builder()
                                 .accessToken(jwtToken)
                                 .refreshToken(refreshToken)
