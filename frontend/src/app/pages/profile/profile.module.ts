@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 import { ProfileComponent } from './profile.component';
 import { RouterModule } from '@angular/router';
 
@@ -8,7 +8,7 @@ import { RouterModule } from '@angular/router';
     declarations: [ProfileComponent],
     imports: [
         CommonModule,
-        FormsModule,
+        ReactiveFormsModule,
         RouterModule.forChild([{ path: '', component: ProfileComponent }])
     ]
 })

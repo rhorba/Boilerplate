@@ -15,11 +15,19 @@ public class UserGroupService {
 
     private final UserGroupRepository userGroupRepository;
     private final ActivityLogService activityLogService;
+    private final UserService userService;
 
     public UserGroup createGroup(UserGroup group) {
-        UserGroup saved = userGroupRepository.save(group);
         String currentUserEmail = org.springframework.security.core.context.SecurityContextHolder.getContext()
                 .getAuthentication().getName();
+
+        userService.getUserByEmail(currentUserEmail).ifPresent(user -> {
+            group.setOwner(user);
+            // Optionally add creator as member
+            // group.setUsers(List.of(user));
+        });
+
+        UserGroup saved = userGroupRepository.save(group);
         activityLogService.log("CREATE_GROUP", "Created group: " + saved.getName(), currentUserEmail);
         return saved;
     }

@@ -31,7 +31,7 @@ public class UserGroupController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<UserGroup> createGroup(@RequestBody UserGroup group) {
         return ResponseEntity.ok(userGroupService.createGroup(group));
     }

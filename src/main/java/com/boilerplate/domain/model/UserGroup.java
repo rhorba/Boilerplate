@@ -14,6 +14,7 @@ public class UserGroup {
     private Long id;
     private String name;
     private String description;
+    private User owner;
     private List<User> users;
     private List<Page> pages;
 }

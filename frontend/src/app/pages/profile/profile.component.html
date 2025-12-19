@@ -1,18 +1,50 @@
 <div style="padding: 2rem;">
     <h2>User Profile</h2>
-    <div class="card">
+
+    <div *ngIf="successMessage" class="alert alert-success" style="padding: 1rem; background-color: #d1e7dd; color: #0f5132; margin-bottom: 1rem; border-radius: 4px;">
+        {{ successMessage }}
+    </div>
+
+    <div *ngIf="errorMessage" class="alert alert-danger" style="padding: 1rem; background-color: #f8d7da; color: #842029; margin-bottom: 1rem; border-radius: 4px;">
+        {{ errorMessage }}
+    </div>
+
+    <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="card">
         <div class="form-group">
             <label class="form-label">Email</label>
-            <input type="text" class="form-control" [value]="email" disabled>
+            <input type="text" class="form-control" formControlName="email">
         </div>
         <div class="form-group">
             <label class="form-label">Role</label>
-            <input type="text" class="form-control" [value]="role" disabled>
+            <input type="text" class="form-control" formControlName="role">
         </div>
+        
         <div class="form-group">
-            <label class="form-label">Account Status</label>
-            <span class="badge"
-                style="background: #dcfce7; color: #166534; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem;">Active</span>
+            <label class="form-label">First Name</label>
+            <input type="text" class="form-control" formControlName="firstname">
+            <div *ngIf="profileForm.get('firstname')?.invalid && profileForm.get('firstname')?.touched" style="color: red; font-size: 0.875rem;">
+                First Name is required
+            </div>
         </div>
-    </div>
+
+        <div class="form-group">
+            <label class="form-label">Last Name</label>
+            <input type="text" class="form-control" formControlName="lastname">
+            <div *ngIf="profileForm.get('lastname')?.invalid && profileForm.get('lastname')?.touched" style="color: red; font-size: 0.875rem;">
+                Last Name is required
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">New Password (Optional)</label>
+            <input type="password" class="form-control" formControlName="password" placeholder="Leave empty to keep current password">
+        </div>
+
+        <div style="margin-top: 1.5rem;">
+            <button type="submit" class="btn btn-primary" [disabled]="loading || profileForm.invalid">
+                <span *ngIf="loading">Saving...</span>
+                <span *ngIf="!loading">Save Changes</span>
+            </button>
+        </div>
+    </form>
 </div>

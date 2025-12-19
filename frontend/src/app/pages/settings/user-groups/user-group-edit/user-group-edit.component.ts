@@ -11,7 +11,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 export class UserGroupEditComponent implements OnInit {
 
     group: UserGroup = {
-        id: 0,
         name: '',
         description: ''
     };
@@ -32,7 +31,7 @@ export class UserGroupEditComponent implements OnInit {
     }
 
     saveGroup() {
-        if (this.isEditMode) {
+        if (this.isEditMode && this.group.id) {
             this.userGroupService.updateGroup(this.group.id, this.group).subscribe(() => {
                 this.router.navigate(['/settings/user-groups']);
             });

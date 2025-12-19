@@ -23,10 +23,11 @@
             [style.color]="activeTab === 'logs' ? '#2563eb' : '#64748b'"
             style="background: none; border-radius: 0; padding: 0.5rem 1rem;" (click)="activeTab = 'logs'">Activity
             Logs</button>
-        <a class="btn" routerLink="/settings/user-groups"
-            style="background: none; border-radius: 0; padding: 0.5rem 1rem; color: #64748b; text-decoration: none; display: flex; align-items: center;">
-            User Groups <span class="material-icons" style="font-size: 1rem; margin-left: 4px;">open_in_new</span>
-        </a>
+        <button class="btn" [style.border-bottom]="activeTab === 'user-groups' ? '2px solid #2563eb' : 'none'"
+            [style.color]="activeTab === 'user-groups' ? '#2563eb' : '#64748b'"
+            style="background: none; border-radius: 0; padding: 0.5rem 1rem;" (click)="activeTab = 'user-groups'">
+            Workspaces
+        </button>
     </div>
 
     <!-- PAGES TAB -->
@@ -400,6 +401,50 @@
 
                     <button class="btn" [disabled]="userPage >= userTotalPages" (click)="changeUserPage(userPage + 1)"
                         style="background: #e2e8f0; color: #1e293b; padding: 0.25rem 0.75rem;">Next</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- USER GROUPS TAB -->
+    <div *ngIf="activeTab === 'user-groups'">
+        <app-user-group-list></app-user-group-list>
+    </div>
+
+    <!-- BILLING TAB -->
+    <div *ngIf="activeTab === 'billing'">
+        <div class="card" style="max-width: 800px; margin-bottom: 2rem;">
+            <h3>Subscription & Billing</h3>
+            <p style="color: #64748b; margin-bottom: 2rem;">Manage your subscription plan and billing history.</p>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+                <!-- Free Plan -->
+                <div style="border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 1.5rem;">
+                    <h4>Free Plan</h4>
+                    <p style="font-size: 1.5rem; font-weight: bold; margin: 0.5rem 0;">$0 <span
+                            style="font-size: 0.875rem; color: #64748b; font-weight: normal;">/mo</span></p>
+                    <ul style="list-style: none; padding: 0; margin: 1.5rem 0; color: #475569;">
+                        <li style="margin-bottom: 0.5rem;">✓ 1 Workspace</li>
+                        <li style="margin-bottom: 0.5rem;">✓ 5 Users</li>
+                        <li style="margin-bottom: 0.5rem;">✓ Basic Analytics</li>
+                    </ul>
+                    <button class="btn" style="width: 100%; background: #e2e8f0; color: #1e293b;" disabled>Current
+                        Plan</button>
+                </div>
+
+                <!-- Pro Plan -->
+                <div style="border: 2px solid #2563eb; border-radius: 0.5rem; padding: 1.5rem; position: relative;">
+                    <span
+                        style="position: absolute; top: -10px; right: 10px; background: #2563eb; color: white; padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.75rem;">POPULAR</span>
+                    <h4>Pro Plan</h4>
+                    <p style="font-size: 1.5rem; font-weight: bold; margin: 0.5rem 0;">$29 <span
+                            style="font-size: 0.875rem; color: #64748b; font-weight: normal;">/mo</span></p>
+                    <ul style="list-style: none; padding: 0; margin: 1.5rem 0; color: #475569;">
+                        <li style="margin-bottom: 0.5rem;">✓ Unlimited Workspaces</li>
+                        <li style="margin-bottom: 0.5rem;">✓ Unlimited Users</li>
+                        <li style="margin-bottom: 0.5rem;">✓ Advanced Analytics</li>
+                    </ul>
+                    <button class="btn btn-primary" style="width: 100%;" (click)="subscribeToPro()">Upgrade Now</button>
                 </div>
             </div>
         </div>

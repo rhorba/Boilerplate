@@ -10,6 +10,7 @@ import { UserGroup } from '../../core/models/user-group.model';
 import { UserGroupService } from '../../core/services/user-group.service';
 import { User } from '../../core/models/user.model';
 import { Role } from '../../core/models/role.model';
+import { PaymentService } from '../../core/services/payment.service';
 @Component({
   selector: 'app-settings',
   templateUrl: './settings.component.html',
@@ -70,6 +71,20 @@ export class SettingsComponent implements OnInit {
 
   // User Groups
   userGroupsList: UserGroup[] = [];
+  newGroupName = '';
+
+  createGroup() {
+    if (!this.newGroupName.trim()) return;
+    const newGroup: UserGroup = { name: this.newGroupName, description: 'Created via Settings' };
+    this.userGroupService.createGroup(newGroup).subscribe({
+      next: (group) => {
+        this.newGroupName = '';
+        this.loadUserGroups();
+        this.notificationService.success('Workspace created successfully');
+      },
+      error: (err) => this.notificationService.error('Failed to create workspace')
+    });
+  }
 
   constructor(
     private pageService: PageService,
@@ -78,8 +93,21 @@ export class SettingsComponent implements OnInit {
     private userService: UserService,
     private logService: ActivityLogService,
     private notificationService: NotificationService,
-    private userGroupService: UserGroupService
+    private userGroupService: UserGroupService,
+    private paymentService: PaymentService
   ) { }
+
+  subscribeToPro() {
+    this.paymentService.createCheckoutSession('price_1234567890').subscribe({
+      next: (res) => {
+        window.location.href = res.url;
+      },
+      error: (err) => {
+        console.error('Payment failed', err);
+        this.notificationService.error('Failed to initiate payment');
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.loadPages();

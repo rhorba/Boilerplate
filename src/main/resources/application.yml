@@ -6,13 +6,16 @@ spring:
   application:
     name: spring-boot-enterprise-boilerplate
   datasource:
-    url: jdbc:postgresql://localhost:5432/boilerplate_db
+    url: jdbc:postgresql://127.0.0.1:5432/boilerplate_db
     username: postgres
     password: password
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
+    flyway:
+      enabled: true
+      baseline-on-migrate: true
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
@@ -41,6 +44,10 @@ security:
     secret-key: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970 # Replace with a strong secret in prod
     expiration-time: 3600000 # 1 hour
     refresh-token-expiration-time: 86400000 # 1 day
+
+stripe:
+  secret-key: sk_test_replace_me
+  webhook-secret: whsec_replace_me
 
 # Logging
 logging:

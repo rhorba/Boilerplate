@@ -1,5 +1,6 @@
 package com.boilerplate.application.service;
 
+import com.boilerplate.application.service.UserService;
 import com.boilerplate.domain.model.UserGroup;
 import com.boilerplate.domain.port.out.UserGroupRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -31,6 +32,9 @@ class UserGroupServiceTest {
     @Mock
     private ActivityLogService activityLogService;
 
+    @Mock
+    private UserService userService;
+
     @InjectMocks
     private UserGroupService userGroupService;
 
@@ -58,6 +62,7 @@ class UserGroupServiceTest {
         UserGroup group = UserGroup.builder().name("Test Group").build();
         when(userGroupRepository.save(group)).thenReturn(group);
         when(authentication.getName()).thenReturn("admin@example.com");
+        when(userService.getUserByEmail("admin@example.com")).thenReturn(Optional.empty());
 
         UserGroup result = userGroupService.createGroup(group);
 

@@ -29,11 +29,41 @@ export class UserGroupListComponent implements OnInit {
     }
 
     editGroup(group: UserGroup) {
-        this.router.navigate(['/settings/user-groups/edit', group.id]);
+        if (group.id) {
+            this.router.navigate(['/settings/user-groups/edit', group.id]);
+        }
     }
 
-    deleteGroup(id: number) {
-        if (confirm('Are you sure you want to delete this group?')) {
+    // Inline Editing
+    editingCell: { id: number, field: string } | null = null;
+
+    startEdit(id: number, field: string) {
+        this.editingCell = { id, field };
+    }
+
+    stopEdit(group: UserGroup) {
+        if (this.editingCell && this.editingCell.id === group.id) {
+            this.editingCell = null;
+            if (group.id) {
+                this.userGroupService.updateGroup(group.id, group).subscribe(
+                    () => {
+                        // Success toast or feedback could go here
+                    },
+                    (err) => {
+                        console.error('Failed to update group', err);
+                        this.loadGroups(); // Revert on error
+                    }
+                );
+            }
+        }
+    }
+
+    isEditing(id: number | undefined, field: string): boolean {
+        return !!id && !!this.editingCell && this.editingCell.id === id && this.editingCell.field === field;
+    }
+
+    deleteGroup(id?: number) {
+        if (id && confirm('Are you sure you want to delete this group?')) {
             this.userGroupService.deleteGroup(id).subscribe(() => {
                 this.loadGroups();
             });

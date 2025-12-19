@@ -56,13 +56,11 @@ public class UserGroupRepositoryAdapter implements UserGroupRepository {
                 .id(domain.getId())
                 .name(domain.getName())
                 .description(domain.getDescription())
+                .owner(domain.getOwner() != null
+                        ? UserEntity.builder().id(domain.getOwner().getId()).build()
+                        : null)
                 // Relationships are handled via ID usually or assume they are managed by
                 // Service separately to avoid cyclic mapping issues
-                // For simplicity, we might skip mapping full User/Page lists back to entity
-                // here if strictly for updates,
-                // but if we want to save associations, we need them.
-                // NOTE: Mapping full deep structures can be tricky. Let's keep it simple for
-                // now or fetch existing refs.
                 .build();
     }
 
@@ -71,6 +69,7 @@ public class UserGroupRepositoryAdapter implements UserGroupRepository {
                 .id(entity.getId())
                 .name(entity.getName())
                 .description(entity.getDescription())
+                .owner(entity.getOwner() != null ? toUserDomainSummary(entity.getOwner()) : null)
                 .users(entity.getUsers() != null
                         ? entity.getUsers().stream().map(this::toUserDomainSummary).collect(Collectors.toList())
                         : Collections.emptyList())

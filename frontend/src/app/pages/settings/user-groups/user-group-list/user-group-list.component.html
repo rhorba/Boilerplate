@@ -1,38 +1,41 @@
-<div class="container mx-auto p-4">
-  <div class="flex justify-between items-center mb-4">
-    <h1 class="text-2xl font-bold">User Groups</h1>
-    <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" (click)="createGroup()">
+<div class="card" style="max-width: 1000px; margin-bottom: 2rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+    <h3>My Workspaces</h3>
+    <button class="btn btn-primary" (click)="createGroup()">
       Create Group
     </button>
   </div>
 
-  <div class="bg-white shadow-md rounded my-6">
-    <table class="min-w-full table-auto">
-      <thead>
-        <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
-          <th class="py-3 px-6 text-left">ID</th>
-          <th class="py-3 px-6 text-left">Name</th>
-          <th class="py-3 px-6 text-left">Description</th>
-          <th class="py-3 px-6 text-center">Actions</th>
-        </tr>
-      </thead>
-      <tbody class="text-gray-600 text-sm font-light">
-        <tr *ngFor="let group of groups" class="border-b border-gray-200 hover:bg-gray-100">
-          <td class="py-3 px-6 text-left whitespace-nowrap">{{ group.id }}</td>
-          <td class="py-3 px-6 text-left">{{ group.name }}</td>
-          <td class="py-3 px-6 text-left">{{ group.description }}</td>
-          <td class="py-3 px-6 text-center">
-            <div class="flex item-center justify-center">
-              <button class="w-4 mr-2 transform hover:text-purple-500 hover:scale-110" (click)="editGroup(group)">
-                Edit
-              </button>
-              <button class="w-4 mr-2 transform hover:text-red-500 hover:scale-110" (click)="deleteGroup(group.id)">
-                Delete
-              </button>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+  <table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
+    <thead>
+      <tr style="text-align: left; border-bottom: 1px solid #e2e8f0;">
+        <th style="padding: 0.75rem;">ID</th>
+        <th style="padding: 0.75rem;">Name</th>
+        <th style="padding: 0.75rem;">Description</th>
+        <th style="padding: 0.75rem;">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let group of groups" style="border-bottom: 1px solid #f1f5f9;">
+        <td style="padding: 0.75rem;">{{ group.id }}</td>
+        <td style="padding: 0.75rem;" (click)="startEdit(group.id!, 'name')">
+          <span *ngIf="!isEditing(group.id, 'name')" style="font-weight: 500; cursor: pointer;">{{ group.name }}</span>
+          <input *ngIf="isEditing(group.id, 'name')" [(ngModel)]="group.name" (blur)="stopEdit(group)"
+            (keyup.enter)="stopEdit(group)" class="form-control" style="width: 100%;" autofocus>
+        </td>
+        <td style="padding: 0.75rem;" (click)="startEdit(group.id!, 'description')">
+          <span *ngIf="!isEditing(group.id, 'description')" style="color: #64748b; cursor: pointer;">{{
+            group.description || 'Click to add description' }}</span>
+          <input *ngIf="isEditing(group.id, 'description')" [(ngModel)]="group.description" (blur)="stopEdit(group)"
+            (keyup.enter)="stopEdit(group)" class="form-control" style="width: 100%;" autofocus>
+        </td>
+        <td style="padding: 0.75rem;">
+          <button class="btn" style="color: #dc2626; background: none; border: none; padding: 0;"
+            (click)="deleteGroup(group.id)">
+            Delete
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 </div>
