@@ -36,6 +36,8 @@ public class UserService {
             existingUser.setLastname(updatedUser.getLastname());
             existingUser.setEmail(updatedUser.getEmail());
             existingUser.setRole(updatedUser.getRole());
+            existingUser.setGroups(updatedUser.getGroups());
+            existingUser.setActions(updatedUser.getActions());
 
             // Only update password if provided and not empty
             if (updatedUser.getPassword() != null && !updatedUser.getPassword().isEmpty()) {

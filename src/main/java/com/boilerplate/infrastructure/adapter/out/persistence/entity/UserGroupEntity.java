@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.util.List;
 
@@ -26,12 +28,21 @@ public class UserGroupEntity {
 
     @ManyToOne
     @JoinColumn(name = "owner_id")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties("groups")
     private UserEntity owner;
 
     @ManyToMany(mappedBy = "groups")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties("groups")
     private List<UserEntity> users;
 
     @ManyToMany
     @JoinTable(name = "group_pages", joinColumns = @JoinColumn(name = "group_id"), inverseJoinColumns = @JoinColumn(name = "page_id"))
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties("groups")
     private List<PageEntity> pages;
 }

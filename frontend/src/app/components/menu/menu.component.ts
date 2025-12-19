@@ -72,6 +72,10 @@ export class MenuComponent implements OnInit {
       ];
 
       this.filterMenu();
+    }, (error) => {
+      console.error('Failed to load pages', error);
+      // Fallback to static menu
+      this.filterMenu();
     });
   }
 
@@ -86,13 +90,16 @@ export class MenuComponent implements OnInit {
   }
 
   filterMenu() {
+    console.log('Current User Role:', this.userRole);
     if (!this.userRole) {
       this.displayedMenuItems = [];
       return;
     }
     this.displayedMenuItems = this.allMenuItems.filter(item => {
       if (!item.roles || item.roles.length === 0) return true;
-      return item.roles.includes(this.userRole!);
+      const hasRole = item.roles.some(r => r.toUpperCase() === this.userRole?.toUpperCase());
+      console.log(`Item: ${item.label}, Roles: ${item.roles}, UserRole: ${this.userRole}, Visible: ${hasRole}`);
+      return hasRole;
     });
   }
 

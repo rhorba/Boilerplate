@@ -1,5 +1,6 @@
 import { Role } from './role.model';
 import { UserGroup } from './user-group.model';
+import { Action } from '../services/action.service';
 
 export interface User {
     id?: number;
@@ -9,4 +10,5 @@ export interface User {
     lastname?: string;
     password?: string;
     groups?: UserGroup[];
+    actions?: Action[];
 }

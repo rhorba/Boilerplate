@@ -18,4 +18,5 @@ public class User {
     private String password;
     private Role role;
     private java.util.List<UserGroup> groups;
+    private java.util.List<Action> actions;
 }

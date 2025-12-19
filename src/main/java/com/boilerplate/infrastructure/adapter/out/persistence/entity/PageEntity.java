@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @Builder
@@ -35,6 +37,9 @@ public class PageEntity {
     @Column(columnDefinition = "TEXT")
     private String accessControl;
 
-    @ManyToMany(mappedBy = "pages")
+    @ManyToMany(mappedBy = "pages", fetch = FetchType.EAGER)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties({ "pages", "users", "owner" })
     private java.util.List<UserGroupEntity> groups;
 }

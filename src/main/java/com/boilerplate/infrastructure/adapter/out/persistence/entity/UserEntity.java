@@ -13,7 +13,9 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -46,7 +48,16 @@ public class UserEntity implements UserDetails {
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_group_members", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "group_id"))
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties({ "users", "owner", "pages" })
     private List<UserGroupEntity> groups;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "user_actions", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "action_id"))
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private List<ActionEntity> actions;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

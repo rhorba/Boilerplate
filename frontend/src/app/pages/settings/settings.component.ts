@@ -497,4 +497,21 @@ export class SettingsComponent implements OnInit {
     if (!this.currentUserEdit || !this.currentUserEdit.groups) return false;
     return this.currentUserEdit.groups.some(g => g.id === group.id);
   }
+
+  toggleUserAction(action: Action) {
+    if (!this.currentUserEdit) return;
+    if (!this.currentUserEdit.actions) this.currentUserEdit.actions = [];
+
+    const index = this.currentUserEdit.actions.findIndex(a => a.id === action.id);
+    if (index === -1) {
+      this.currentUserEdit.actions.push(action);
+    } else {
+      this.currentUserEdit.actions.splice(index, 1);
+    }
+  }
+
+  hasUserAction(action: Action): boolean {
+    if (!this.currentUserEdit || !this.currentUserEdit.actions) return false;
+    return this.currentUserEdit.actions.some(a => a.id === action.id);
+  }
 }

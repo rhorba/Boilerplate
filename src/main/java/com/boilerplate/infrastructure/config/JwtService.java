@@ -37,11 +37,12 @@ public class JwtService implements com.boilerplate.application.port.out.TokenPro
 
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> extraClaims = new HashMap<>();
-        if (userDetails instanceof com.boilerplate.infrastructure.adapter.out.persistence.entity.UserEntity) {
-            extraClaims.put("role",
-                    ((com.boilerplate.infrastructure.adapter.out.persistence.entity.UserEntity) userDetails).getRole()
-                            .getName());
-        }
+        String role = userDetails.getAuthorities().stream()
+                .findFirst()
+                .map(org.springframework.security.core.GrantedAuthority::getAuthority)
+                .map(auth -> auth.replace("ROLE_", ""))
+                .orElse("USER");
+        extraClaims.put("role", role);
         return generateToken(extraClaims, userDetails);
     }
 

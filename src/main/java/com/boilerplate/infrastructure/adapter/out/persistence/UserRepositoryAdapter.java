@@ -48,6 +48,12 @@ public class UserRepositoryAdapter implements UserRepository {
                                 .name(g.getName())
                                 .build())
                         .collect(java.util.stream.Collectors.toList()) : java.util.Collections.emptyList())
+                .actions(entity.getActions() != null ? entity.getActions().stream()
+                        .map(a -> com.boilerplate.domain.model.Action.builder()
+                                .id(a.getId())
+                                .name(a.getName())
+                                .build())
+                        .collect(java.util.stream.Collectors.toList()) : java.util.Collections.emptyList())
                 .build();
     }
 
@@ -83,6 +89,12 @@ public class UserRepositoryAdapter implements UserRepository {
                         .map(g -> com.boilerplate.infrastructure.adapter.out.persistence.entity.UserGroupEntity
                                 .builder()
                                 .id(g.getId())
+                                .build())
+                        .collect(java.util.stream.Collectors.toList()) : java.util.Collections.emptyList())
+                .actions(user.getActions() != null ? user.getActions().stream()
+                        .map(a -> com.boilerplate.infrastructure.adapter.out.persistence.entity.ActionEntity
+                                .builder()
+                                .id(a.getId())
                                 .build())
                         .collect(java.util.stream.Collectors.toList()) : java.util.Collections.emptyList())
                 .build();
