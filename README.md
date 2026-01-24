@@ -39,7 +39,7 @@ Open-source enterprise-grade boilerplate featuring a decoupled monorepo architec
    ```
    Backend runs at `http://localhost:8080`
 
-3. **Start Frontend** (new terminal - coming in next batch)
+3. **Start Frontend** (new terminal)
    ```bash
    cd frontend
    pnpm install
@@ -76,11 +76,11 @@ Access:
 │   └── application*.yml # Configuration files
 └── pom.xml
 
-/frontend                # Angular 18 frontend (coming soon)
+/frontend                # Angular 18 frontend
 ├── src/app/
 │   ├── core/           # Services, guards, interceptors
 │   ├── features/       # Feature modules (auth, users, etc.)
-│   └── services/       # API services
+│   └── shared/         # Shared components and utilities
 └── package.json
 ```
 
@@ -110,6 +110,10 @@ Access Swagger UI at: `http://localhost:8080/swagger-ui.html`
 - `ROLE_DELETE` - Delete roles
 - `ROLE_MANAGE` - Full role management
 
+### Permission Management
+- `PERMISSION_READ` - View permissions
+- `PERMISSION_MANAGE` - Full permission management
+
 ### System
 - `SYSTEM_MANAGE` - Full system administration
 
@@ -124,7 +128,7 @@ mvn verify                 # Run tests + quality checks
 mvn flyway:migrate         # Run database migrations
 ```
 
-### Frontend (coming soon)
+### Frontend
 ```bash
 pnpm dev                   # Start dev server
 pnpm build                 # Build for production
