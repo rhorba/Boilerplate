@@ -33,6 +33,5 @@ public interface UserMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateEntity(@MappingTarget User user, UpdateUserRequest request);
 
-    @Mapping(target = "password", ignore = true)  // Never expose password
     UserResponse toResponse(User user);
 }

@@ -9,7 +9,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@lombok.experimental.SuperBuilder
 public class Permission extends BaseEntity {
 
     @Column(nullable = false, unique = true, length = 100)

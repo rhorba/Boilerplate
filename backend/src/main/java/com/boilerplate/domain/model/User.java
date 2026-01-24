@@ -12,7 +12,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@lombok.experimental.SuperBuilder
 public class User extends BaseEntity {
 
     @Column(nullable = false, unique = true, length = 100)

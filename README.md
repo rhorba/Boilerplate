@@ -51,6 +51,36 @@ Open-source enterprise-grade boilerplate featuring a decoupled monorepo architec
    - Username: `admin`
    - Password: `admin123`
 
+### Docker Development Mode (H2 Database)
+
+Run both backend and frontend in Docker with hot-reload enabled:
+
+```bash
+# Start all services
+docker-compose -f docker-compose.dev.yml up --build
+
+# Or run in detached mode
+docker-compose -f docker-compose.dev.yml up --build -d
+
+# View logs
+docker-compose -f docker-compose.dev.yml logs -f
+
+# Stop all services
+docker-compose -f docker-compose.dev.yml down
+```
+
+Access:
+- Frontend: `http://localhost:4200`
+- Backend API: `http://localhost:8080/api`
+- Swagger UI: `http://localhost:8080/swagger-ui.html`
+- H2 Console: `http://localhost:8080/h2-console` (JDBC URL: `jdbc:h2:mem:boilerplate`, username: `sa`, password: empty)
+
+**Features**:
+- Hot-reload for both frontend and backend
+- H2 in-memory database (data resets on restart)
+- Source code mounted as volumes for live development
+- Automatic Flyway migrations and seed data on startup
+
 ### Production Mode (Docker Compose + PostgreSQL)
 
 ```bash

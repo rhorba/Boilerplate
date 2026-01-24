@@ -18,6 +18,7 @@ export class UserListComponent implements OnInit {
   error = signal<string | null>(null);
   page = signal(0);
   size = signal(10);
+  Math = Math;
 
   ngOnInit(): void {
     this.loadUsers();
