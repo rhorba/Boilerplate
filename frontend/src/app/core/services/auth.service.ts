@@ -11,6 +11,12 @@ export interface LoginRequest {
   rememberMe?: boolean;
 }
 
+export interface RegisterRequest {
+  username: string;
+  email: string;
+  password: string;
+}
+
 export interface AuthResponse {
   accessToken: string;
   refreshToken: string;
@@ -55,6 +61,16 @@ export class AuthService {
 
   login(credentials: LoginRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${environment.apiUrl}/auth/login`, credentials)
+      .pipe(tap(response => {
+        this.tokenService.setAccessToken(response.accessToken);
+        this.tokenService.setRefreshToken(response.refreshToken);
+        this.currentUser.set(response.user);
+        this.isAuthenticated.set(true);
+      }));
+  }
+
+  register(data: RegisterRequest): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${environment.apiUrl}/auth/register`, data)
       .pipe(tap(response => {
         this.tokenService.setAccessToken(response.accessToken);
         this.tokenService.setRefreshToken(response.refreshToken);

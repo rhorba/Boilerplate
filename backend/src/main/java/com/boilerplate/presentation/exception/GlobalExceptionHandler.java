@@ -103,6 +103,20 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler(RateLimitExceededException.class)
+    @ResponseStatus(HttpStatus.TOO_MANY_REQUESTS)
+    public ErrorResponse handleRateLimitExceededException(
+        RateLimitExceededException ex,
+        HttpServletRequest request
+    ) {
+        log.warn("Rate limit exceeded: {}", ex.getMessage());
+        return buildErrorResponse(
+            HttpStatus.TOO_MANY_REQUESTS,
+            ex.getMessage(),
+            request.getRequestURI()
+        );
+    }
+
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleGlobalException(Exception ex, HttpServletRequest request) {
