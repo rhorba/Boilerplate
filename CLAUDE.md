@@ -60,11 +60,12 @@ All phases of the boilerplate implementation have been successfully completed. T
 - Domain entities with JPA Auditing:
   - BaseEntity (id, version, createdAt, updatedAt)
   - User, Role, Permission entities
-- 8 Flyway migrations:
+- 9 Flyway migrations:
   - V1-V5: Table creation with indexes
   - V6: 13 permissions (USER_*, ROLE_*, PERMISSION_*, SYSTEM_MANAGE)
   - V7: 3 roles (ADMIN, USER, MODERATOR)
   - V8: Seed admin user (admin/admin123)
+  - V9: Soft-delete support (deleted_at column on users)
 - JPA repositories with JOIN FETCH queries to prevent N+1
 - Request/Response DTOs with Bean Validation
 - MapStruct mappers (User, Role, Permission)
@@ -89,13 +90,15 @@ All phases of the boilerplate implementation have been successfully completed. T
   - DuplicateResourceException (409)
   - GlobalExceptionHandler for all error cases
 - Services:
-  - AuthService (login, refresh token)
-  - UserService (CRUD with duplicate checks)
+  - AuthService (login, refresh token, self-registration with auto-login)
+  - UserService (CRUD, soft-delete, restore, purge, bulk operations, search/filter)
 - Controllers with OpenAPI annotations:
-  - AuthController (/api/auth/*)
-  - UserController (/api/users/*) with permission-based access
+  - AuthController (/api/auth/*) with registration endpoint
+  - UserController (/api/users/*) with permission-based access, bulk ops, soft-delete
+  - RoleController (/api/roles/*) for role listing
 - Unit tests:
-  - UserServiceTest with Mockito and AssertJ
+  - UserServiceTest with Mockito and AssertJ (soft-delete-aware)
+  - AuthServiceTest with registration tests
 - Documentation:
   - README.md (setup, architecture, features)
   - CONTRIBUTING.md (code standards, workflow)
@@ -108,17 +111,20 @@ All phases of the boilerplate implementation have been successfully completed. T
   - TypeScript 5.5.2 with strict mode
 - Core services:
   - TokenService (localStorage management)
-  - AuthService with signals (currentUser, isAuthenticated)
-  - UserService (API integration)
+  - AuthService with signals (currentUser, isAuthenticated, self-registration)
+  - UserService (full CRUD, search/filter, bulk operations, soft-delete)
 - HTTP interceptors:
   - authInterceptor (Bearer token injection)
   - errorInterceptor (401 logout, error logging)
 - Guards:
   - authGuard (route protection with returnUrl)
+- Shared models:
+  - User, Role, Permission TypeScript interfaces
 - Components:
   - LoginComponent (reactive form with rememberMe)
   - DashboardComponent (user info, role badges)
-  - UserListComponent (pagination, CRUD operations)
+  - UserListComponent (search, role/status filters, sortable columns, bulk actions, pagination)
+  - UserEditPanelComponent (slide-out form with validation and keyboard support)
 - Routing:
   - Lazy-loaded routes with guards
   - Default redirect to dashboard
@@ -132,6 +138,7 @@ All phases of the boilerplate implementation have been successfully completed. T
 **Authentication & Authorization:**
 - JWT-based stateless authentication
 - Remember me functionality (90-day tokens)
+- Self-registration with auto-login and rate limiting
 - Role-based access control (RBAC)
 - Permission-based authorization at endpoint level
 - Automatic token refresh mechanism
@@ -142,6 +149,10 @@ All phases of the boilerplate implementation have been successfully completed. T
 - BCrypt password hashing
 - Role assignment and management
 - Pagination support
+- Soft-delete with restore and permanent purge
+- Server-side search and filtering (JPA Specifications)
+- Bulk operations (delete, enable, disable)
+- Slide-out edit panel with form validation
 
 **Security Features:**
 - CORS configuration
@@ -254,9 +265,10 @@ Boilerplate/
 │   ├── angular.json
 │   ├── tailwind.config.js
 │   └── package.json
+├── docs/
+│   └── plans/                         # Archived implementation plans
 ├── docker-compose.dev.yml             # H2 development setup
 ├── docker-compose.prod.yml            # PostgreSQL production setup
 ├── .gitattributes                     # LF enforcement
 ├── README.md                          # Full documentation
-├── CONTRIBUTING.md                    # Contribution guidelines
-└── IMPLEMENTATION_PLAN.md             # Original implementation plan
+└── CONTRIBUTING.md                    # Contribution guidelines

@@ -7,8 +7,10 @@ Open-source enterprise-grade boilerplate featuring a decoupled monorepo architec
 - **Backend**: Spring Boot 3.4, Java 21, PostgreSQL/H2, JWT Authentication
 - **Frontend**: Angular 18, TanStack Query, Tailwind CSS, Signals
 - **Security**: Role-Based Access Control (RBAC) with permission-level granularity
+- **Authentication**: JWT with refresh tokens, self-registration with auto-login
+- **User Management**: Soft-delete, server-side search/filtering, bulk operations, slide-out edit panel
 - **Architecture**: Hexagonal/Clean Architecture on backend, layer-based on frontend
-- **Database**: Flyway migrations, seeded data
+- **Database**: Flyway migrations (V1-V9), seeded data
 - **API Documentation**: SpringDoc OpenAPI (Swagger UI)
 - **Observability**: Logback JSON logging, Spring Actuator endpoints
 - **Code Quality**: Checkstyle, SpotBugs, JaCoCo (70% coverage), ESLint, Prettier
@@ -97,21 +99,24 @@ Access:
 ```
 /backend                  # Spring Boot backend
 ├── src/main/java/com/boilerplate/
-│   ├── domain/          # Entities, repositories, business interfaces
+│   ├── domain/          # Entities, repositories, specifications
 │   ├── application/     # DTOs, mappers, service implementations
 │   ├── infrastructure/  # Security, persistence, configs
 │   └── presentation/    # REST controllers, exception handlers
 ├── src/main/resources/
-│   ├── db/migration/    # Flyway SQL migrations
+│   ├── db/migration/    # Flyway SQL migrations (V1-V9)
 │   └── application*.yml # Configuration files
 └── pom.xml
 
 /frontend                # Angular 18 frontend
 ├── src/app/
-│   ├── core/           # Services, guards, interceptors
-│   ├── features/       # Feature modules (auth, users, etc.)
-│   └── shared/         # Shared components and utilities
+│   ├── core/           # Services, guards, interceptors, models
+│   ├── features/       # Feature modules (auth, users, dashboard)
+│   └── services/       # API communication services
 └── package.json
+
+/docs
+└── plans/              # Implementation plans (archived)
 ```
 
 ## API Documentation
@@ -130,8 +135,8 @@ Access Swagger UI at: `http://localhost:8080/swagger-ui.html`
 - `USER_READ` - View users
 - `USER_CREATE` - Create new users
 - `USER_UPDATE` - Modify users
-- `USER_DELETE` - Delete users
-- `USER_MANAGE` - Full user management
+- `USER_DELETE` - Delete users (soft-delete)
+- `USER_MANAGE` - Full user management (restore, purge, bulk operations)
 
 ### Role Management
 - `ROLE_READ` - View roles
@@ -223,12 +228,14 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.
 - MapStruct for DTO mapping (no manual mapping)
 - Flyway for database versioning
 - Repository pattern with JPA
+- JPA Specifications for dynamic search/filtering
+- Soft-delete pattern with restore/purge
 
 ### Frontend - Layer-Based Architecture
 
 **Structure:**
-- **/core**: Authentication, guards, interceptors
-- **/features**: Feature-specific components (auth, users, etc.)
+- **/core**: Authentication, guards, interceptors, shared models
+- **/features**: Feature-specific components (auth, users, dashboard)
 - **/services**: API communication services
 
 **Key Patterns:**
@@ -236,6 +243,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.
 - Signals for reactive state
 - TanStack Query for server state
 - Functional guards and interceptors
+- Shared TypeScript model interfaces
 
 ## License
 
