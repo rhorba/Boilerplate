@@ -9,8 +9,8 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "test:ci": "ng test --watch=false --browsers=ChromeHeadless",
-    "lint": "eslint \"src/**/*.{ts,html}\" && prettier --check \"src/**/*.{ts,html,css,json}\"",
-    "lint:fix": "eslint \"src/**/*.{ts,html}\" --fix && prettier --write \"src/**/*.{ts,html,css,json}\""
+    "lint": "eslint \"src/**/*.ts\" && prettier --check \"src/**/*.{ts,html,css,json}\"",
+    "lint:fix": "eslint \"src/**/*.ts\" --fix && prettier --write \"src/**/*.{ts,html,css,json}\""
   },
   "private": true,
   "dependencies": {

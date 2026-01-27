@@ -60,7 +60,12 @@ export class RegisterComponent {
     this.loading.set(true);
     this.error.set(null);
 
-    const { confirmPassword, ...registerData } = this.registerForm.getRawValue();
+    const formValue = this.registerForm.getRawValue();
+    const registerData = {
+      username: formValue.username,
+      email: formValue.email,
+      password: formValue.password,
+    };
 
     this.authService.register(registerData).subscribe({
       next: () => {

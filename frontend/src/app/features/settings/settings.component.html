@@ -2,16 +2,10 @@
 
 <div class="space-y-4">
   <!-- Dark Mode Toggle -->
-  <div
-    class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6 flex items-center justify-between"
-  >
+  <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6 flex items-center justify-between">
     <div>
-      <h3 class="text-lg font-medium text-gray-900 dark:text-white">
-        Dark Mode
-      </h3>
-      <p class="text-sm text-gray-500 dark:text-gray-400">
-        Toggle between light and dark theme
-      </p>
+      <h3 class="text-lg font-medium text-gray-900 dark:text-white">Dark Mode</h3>
+      <p class="text-sm text-gray-500 dark:text-gray-400">Toggle between light and dark theme</p>
     </div>
     <button
       (click)="themeService.toggleDarkMode()"
@@ -30,16 +24,10 @@
   </div>
 
   <!-- Sidebar Collapsed Toggle -->
-  <div
-    class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6 flex items-center justify-between"
-  >
+  <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6 flex items-center justify-between">
     <div>
-      <h3 class="text-lg font-medium text-gray-900 dark:text-white">
-        Compact Sidebar
-      </h3>
-      <p class="text-sm text-gray-500 dark:text-gray-400">
-        Collapse sidebar to icons only
-      </p>
+      <h3 class="text-lg font-medium text-gray-900 dark:text-white">Compact Sidebar</h3>
+      <p class="text-sm text-gray-500 dark:text-gray-400">Collapse sidebar to icons only</p>
     </div>
     <button
       (click)="themeService.toggleSidebar()"

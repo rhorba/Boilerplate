@@ -56,11 +56,15 @@
       class="flex items-center gap-3 px-3 py-2"
       [class.justify-center]="themeService.sidebarCollapsed()"
     >
-      <div class="flex-shrink-0 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
+      <div
+        class="flex-shrink-0 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-medium"
+      >
         {{ userInitial }}
       </div>
       @if (!themeService.sidebarCollapsed()) {
-        <span class="text-sm font-medium text-gray-700 dark:text-gray-300 truncate">{{ username }}</span>
+        <span class="text-sm font-medium text-gray-700 dark:text-gray-300 truncate">{{
+          username
+        }}</span>
       }
     </div>
   </div>

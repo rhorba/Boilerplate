@@ -29,6 +29,13 @@ export const routes: Routes = [
           import('./features/users/user-list/user-list.component').then((m) => m.UserListComponent),
       },
       {
+        path: 'audit-logs',
+        loadComponent: () =>
+          import('./features/audit-logs/audit-log-list/audit-log-list.component').then(
+            (m) => m.AuditLogListComponent
+          ),
+      },
+      {
         path: 'profile',
         loadComponent: () =>
           import('./features/profile/profile.component').then((m) => m.ProfileComponent),

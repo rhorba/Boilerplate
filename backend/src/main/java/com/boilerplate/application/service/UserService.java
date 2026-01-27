@@ -34,6 +34,7 @@ public class UserService {
     private final RoleRepository roleRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+    private final AuditPublisher auditPublisher;
 
     @Transactional(readOnly = true)
     public Page<UserResponse> getAllUsers(Pageable pageable) {
@@ -112,6 +113,13 @@ public class UserService {
         User savedUser = userRepository.save(user);
         log.info("User created successfully: {}", savedUser.getUsername());
 
+        auditPublisher.publish(
+            "USER_CREATE",
+            "USER",
+            savedUser.getId().toString(),
+            "Created user: " + savedUser.getUsername()
+        );
+
         return userMapper.toResponse(savedUser);
     }
 
@@ -149,6 +157,13 @@ public class UserService {
         User updatedUser = userRepository.save(user);
         log.info("User updated successfully: {}", updatedUser.getUsername());
 
+        auditPublisher.publish(
+            "USER_UPDATE",
+            "USER",
+            updatedUser.getId().toString(),
+            "Updated user profile"
+        );
+
         return userMapper.toResponse(updatedUser);
     }
 
@@ -162,6 +177,13 @@ public class UserService {
         }
 
         log.info("User soft-deleted successfully with id: {}", id);
+
+        auditPublisher.publish(
+            "USER_DELETE",
+            "USER",
+            id.toString(),
+            "Soft-deleted user"
+        );
     }
 
     @Transactional
@@ -177,6 +199,14 @@ public class UserService {
             .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
 
         log.info("User restored successfully: {}", user.getUsername());
+
+        auditPublisher.publish(
+            "USER_RESTORE",
+            "USER",
+            id.toString(),
+            "Restored user"
+        );
+
         return userMapper.toResponse(user);
     }
 
@@ -188,10 +218,16 @@ public class UserService {
             .filter(u -> u.getDeletedAt() != null)
             .orElseThrow(() -> new ResourceNotFoundException("Deleted user not found with id: " + id));
 
-        userRepository.delete(user);
-        log.info("User permanently deleted: {}", user.getUsername());
-    }
-
+                userRepository.delete(user);
+                log.info("User permanently deleted: {}", user.getUsername());
+        
+                auditPublisher.publish(
+                    "USER_PURGE",
+                    "USER",
+                    id.toString(),
+                    "Permanently deleted user: " + user.getUsername()
+                );
+            }
     @Transactional
     public int bulkSoftDelete(List<Long> ids) {
         log.debug("Bulk soft-deleting users: {}", ids);
@@ -210,6 +246,14 @@ public class UserService {
 
         int deleted = userRepository.softDeleteByIds(ids, LocalDateTime.now());
         log.info("Bulk soft-deleted {} users", deleted);
+
+        auditPublisher.publish(
+            "USER_BULK_DELETE",
+            "USER",
+            "N/A",
+            "Bulk deleted " + deleted + " users. IDs: " + ids
+        );
+
         return deleted;
     }
 
@@ -230,6 +274,14 @@ public class UserService {
         }
 
         log.info("Bulk updated status for {} users to enabled={}", count, enabled);
+
+        auditPublisher.publish(
+            "USER_BULK_STATUS",
+            "USER",
+            "N/A",
+            "Bulk status update to " + enabled + " for " + count + " users. IDs: " + ids
+        );
+
         return count;
     }
 }

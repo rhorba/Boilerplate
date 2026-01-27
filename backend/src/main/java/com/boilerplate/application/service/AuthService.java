@@ -36,6 +36,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final UserMapper userMapper;
+    private final AuditPublisher auditPublisher;
 
     @Transactional(readOnly = true)
     public AuthResponse login(LoginRequest request) {
@@ -58,6 +59,15 @@ public class AuthService {
             .orElseThrow(() -> new RuntimeException("User not found after authentication"));
 
         log.info("User logged in successfully: {}", request.getUsername());
+
+        auditPublisher.publish(
+            userResponse.getId(),
+            userResponse.getUsername(),
+            "LOGIN_SUCCESS",
+            "AUTH",
+            userResponse.getId().toString(),
+            "Login successful via username/password"
+        );
 
         return AuthResponse.builder()
             .accessToken(accessToken)
@@ -134,6 +144,15 @@ public class AuthService {
             .orElseThrow(() -> new RuntimeException("User not found after registration"));
 
         log.info("User registered successfully: {}", request.getUsername());
+
+        auditPublisher.publish(
+            userResponse.getId(),
+            userResponse.getUsername(),
+            "USER_REGISTER",
+            "USER",
+            userResponse.getId().toString(),
+            "Self-registration"
+        );
 
         return AuthResponse.builder()
             .accessToken(accessToken)
