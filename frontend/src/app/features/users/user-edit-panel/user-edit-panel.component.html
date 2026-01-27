@@ -92,6 +92,15 @@
               {{ showPassword() ? 'Hide' : 'Show' }}
             </button>
           </div>
+          @if (editForm.get('password')?.touched && editForm.get('password')?.errors) {
+            <p class="mt-1 text-sm text-red-600 dark:text-red-400">
+              @if (editForm.get('password')?.errors?.['required']) {
+                Password is required.
+              } @else if (editForm.get('password')?.errors?.['minlength']) {
+                Password must be at least 8 characters.
+              }
+            </p>
+          }
         </div>
 
         <!-- Enabled Toggle -->

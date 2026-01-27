@@ -55,6 +55,10 @@ export class UserEditPanelComponent implements OnInit {
         enabled: this.user.enabled,
         roleIds: this.user.roles.map((r) => r.id),
       });
+    } else {
+      const passwordCtrl = this.editForm.get('password')!;
+      passwordCtrl.setValidators([Validators.required, Validators.minLength(8)]);
+      passwordCtrl.updateValueAndValidity();
     }
   }
 
@@ -81,10 +85,6 @@ export class UserEditPanelComponent implements OnInit {
     if (this.editForm.invalid) return;
 
     const formValue = this.editForm.getRawValue();
-    if (this.isCreateMode() && !formValue.password) {
-      this.error.set('Password is required');
-      return;
-    }
 
     this.loading.set(true);
     this.error.set(null);
@@ -106,7 +106,7 @@ export class UserEditPanelComponent implements OnInit {
           this.saved.emit();
         },
         error: (err) => {
-          this.error.set(err.error?.message || 'Failed to create user');
+          this.error.set(this.extractErrorMessage(err, 'Failed to create user'));
           this.loading.set(false);
         },
       });
@@ -135,11 +135,22 @@ export class UserEditPanelComponent implements OnInit {
           this.saved.emit();
         },
         error: (err) => {
-          this.error.set(err.error?.message || 'Failed to update user');
+          this.error.set(this.extractErrorMessage(err, 'Failed to update user'));
           this.loading.set(false);
         },
       });
     }
+  }
+
+  private extractErrorMessage(err: unknown, fallback: string): string {
+    const httpErr = err as {
+      error?: { message?: string; validationErrors?: Record<string, string> };
+    };
+    const body = httpErr.error;
+    if (body?.validationErrors) {
+      return Object.values(body.validationErrors).join('. ');
+    }
+    return body?.message || fallback;
   }
 
   onOverlayClick(event: MouseEvent): void {
