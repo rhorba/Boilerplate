@@ -92,8 +92,8 @@ class AuthServiceTest {
     @Test
     void register_Success() {
         // Arrange
-        when(userRepository.existsByUsername("newuser")).thenReturn(false);
-        when(userRepository.existsByEmail("new@example.com")).thenReturn(false);
+        when(userRepository.existsByUsernameAndDeletedAtIsNull("newuser")).thenReturn(false);
+        when(userRepository.existsByEmailAndDeletedAtIsNull("new@example.com")).thenReturn(false);
         when(roleRepository.findByName("USER")).thenReturn(Optional.of(userRole));
         when(passwordEncoder.encode("password123")).thenReturn("encodedPassword");
         when(userRepository.save(any(User.class))).thenReturn(savedUser);
@@ -126,7 +126,7 @@ class AuthServiceTest {
     @Test
     void register_DuplicateUsername_ThrowsException() {
         // Arrange
-        when(userRepository.existsByUsername("newuser")).thenReturn(true);
+        when(userRepository.existsByUsernameAndDeletedAtIsNull("newuser")).thenReturn(true);
 
         // Act & Assert
         assertThatThrownBy(() -> authService.register(registerRequest))
@@ -139,8 +139,8 @@ class AuthServiceTest {
     @Test
     void register_DuplicateEmail_ThrowsException() {
         // Arrange
-        when(userRepository.existsByUsername("newuser")).thenReturn(false);
-        when(userRepository.existsByEmail("new@example.com")).thenReturn(true);
+        when(userRepository.existsByUsernameAndDeletedAtIsNull("newuser")).thenReturn(false);
+        when(userRepository.existsByEmailAndDeletedAtIsNull("new@example.com")).thenReturn(true);
 
         // Act & Assert
         assertThatThrownBy(() -> authService.register(registerRequest))

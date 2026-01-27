@@ -1,7 +1,11 @@
 package com.boilerplate.presentation.controller;
 
+import com.boilerplate.application.dto.request.BulkActionRequest;
+import com.boilerplate.application.dto.request.BulkStatusRequest;
 import com.boilerplate.application.dto.request.CreateUserRequest;
 import com.boilerplate.application.dto.request.UpdateUserRequest;
+import com.boilerplate.application.dto.request.UserSearchRequest;
+import com.boilerplate.application.dto.response.BulkActionResponse;
 import com.boilerplate.application.dto.response.UserResponse;
 import com.boilerplate.application.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,6 +20,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
@@ -27,9 +33,21 @@ public class UserController {
 
     @GetMapping
     @PreAuthorize("hasAuthority('USER_READ')")
-    @Operation(summary = "Get all users", description = "Retrieve paginated list of users")
-    public ResponseEntity<Page<UserResponse>> getAllUsers(Pageable pageable) {
-        return ResponseEntity.ok(userService.getAllUsers(pageable));
+    @Operation(summary = "Search users", description = "Search and filter users with pagination")
+    public ResponseEntity<Page<UserResponse>> getAllUsers(
+        @RequestParam(required = false) String search,
+        @RequestParam(required = false) String role,
+        @RequestParam(required = false) Boolean enabled,
+        @RequestParam(required = false, defaultValue = "false") Boolean showDeleted,
+        Pageable pageable
+    ) {
+        UserSearchRequest searchRequest = UserSearchRequest.builder()
+            .search(search)
+            .role(role)
+            .enabled(enabled)
+            .showDeleted(showDeleted)
+            .build();
+        return ResponseEntity.ok(userService.searchUsers(searchRequest, pageable));
     }
 
     @GetMapping("/{id}")
@@ -69,5 +87,42 @@ public class UserController {
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/restore")
+    @PreAuthorize("hasAuthority('USER_MANAGE')")
+    @Operation(summary = "Restore user", description = "Restore a soft-deleted user")
+    public ResponseEntity<UserResponse> restoreUser(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.restoreUser(id));
+    }
+
+    @DeleteMapping("/{id}/purge")
+    @PreAuthorize("hasAuthority('USER_DELETE') and hasAuthority('SYSTEM_MANAGE')")
+    @Operation(summary = "Purge user", description = "Permanently delete a soft-deleted user")
+    public ResponseEntity<Void> purgeUser(@PathVariable Long id) {
+        userService.purgeUser(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/bulk/delete")
+    @PreAuthorize("hasAuthority('USER_DELETE')")
+    @Operation(summary = "Bulk delete users", description = "Soft-delete multiple users")
+    public ResponseEntity<BulkActionResponse> bulkDelete(@Valid @RequestBody BulkActionRequest request) {
+        int affected = userService.bulkSoftDelete(request.getUserIds());
+        return ResponseEntity.ok(BulkActionResponse.builder()
+            .affected(affected)
+            .message(affected + " users deleted")
+            .build());
+    }
+
+    @PostMapping("/bulk/status")
+    @PreAuthorize("hasAuthority('USER_UPDATE')")
+    @Operation(summary = "Bulk update status", description = "Enable or disable multiple users")
+    public ResponseEntity<BulkActionResponse> bulkUpdateStatus(@Valid @RequestBody BulkStatusRequest request) {
+        int affected = userService.bulkUpdateStatus(request.getUserIds(), request.getEnabled());
+        return ResponseEntity.ok(BulkActionResponse.builder()
+            .affected(affected)
+            .message(affected + " users updated")
+            .build());
     }
 }

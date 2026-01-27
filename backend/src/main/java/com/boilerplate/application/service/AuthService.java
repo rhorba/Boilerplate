@@ -96,11 +96,11 @@ public class AuthService {
     public AuthResponse register(RegisterRequest request) {
         log.debug("Registration attempt for user: {}", request.getUsername());
 
-        if (userRepository.existsByUsername(request.getUsername())) {
+        if (userRepository.existsByUsernameAndDeletedAtIsNull(request.getUsername())) {
             throw new DuplicateResourceException("Username already exists");
         }
 
-        if (userRepository.existsByEmail(request.getEmail())) {
+        if (userRepository.existsByEmailAndDeletedAtIsNull(request.getEmail())) {
             throw new DuplicateResourceException("Email already exists");
         }
 

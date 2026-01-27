@@ -1,0 +1,151 @@
+<!-- Overlay -->
+<div
+  class="panel-overlay fixed inset-0 bg-black bg-opacity-30 z-40"
+  (click)="onOverlayClick($event)"
+>
+  <!-- Slide-out Panel -->
+  <div class="fixed inset-y-0 right-0 w-full max-w-md bg-white shadow-xl z-50 overflow-y-auto">
+    <!-- Header -->
+    <div class="flex items-center justify-between px-6 py-4 border-b">
+      <h2 class="text-lg font-semibold">Edit User</h2>
+      <button (click)="close.emit()" class="text-gray-400 hover:text-gray-600">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="px-6 py-4">
+      @if (error()) {
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          {{ error() }}
+        </div>
+      }
+
+      <!-- User Meta -->
+      <div class="mb-4 text-sm text-gray-500 space-y-1">
+        <p>ID: {{ user.id }}</p>
+        <p>Created: {{ user.createdAt | date:'medium' }}</p>
+        <p>Updated: {{ user.updatedAt | date:'medium' }}</p>
+      </div>
+
+      <form [formGroup]="editForm" (ngSubmit)="onSubmit()" class="space-y-4">
+        <!-- Username -->
+        <div>
+          <label for="edit-username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+          <input
+            id="edit-username"
+            type="text"
+            formControlName="username"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          @if (editForm.get('username')?.touched && editForm.get('username')?.errors) {
+            <p class="mt-1 text-sm text-red-600">
+              @if (editForm.get('username')?.errors?.['required']) {
+                Username is required.
+              } @else if (editForm.get('username')?.errors?.['minlength']) {
+                Username must be at least 3 characters.
+              }
+            </p>
+          }
+        </div>
+
+        <!-- Email -->
+        <div>
+          <label for="edit-email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+          <input
+            id="edit-email"
+            type="email"
+            formControlName="email"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          @if (editForm.get('email')?.touched && editForm.get('email')?.errors) {
+            <p class="mt-1 text-sm text-red-600">Please enter a valid email address.</p>
+          }
+        </div>
+
+        <!-- Password (optional) -->
+        <div>
+          <label for="edit-password" class="block text-sm font-medium text-gray-700 mb-1">
+            New Password <span class="text-gray-400">(leave blank to keep current)</span>
+          </label>
+          <div class="relative">
+            <input
+              id="edit-password"
+              [type]="showPassword() ? 'text' : 'password'"
+              formControlName="password"
+              placeholder="Enter new password"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
+            />
+            <button
+              type="button"
+              (click)="showPassword.set(!showPassword())"
+              class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-700"
+            >
+              {{ showPassword() ? 'Hide' : 'Show' }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Enabled Toggle -->
+        <div class="flex items-center gap-3">
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input
+              type="checkbox"
+              formControlName="enabled"
+              class="sr-only peer"
+            />
+            <div class="w-11 h-6 bg-gray-200 peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+          </label>
+          <span class="text-sm font-medium text-gray-700">Account Enabled</span>
+        </div>
+
+        <!-- Roles -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Roles</label>
+          <div class="space-y-2">
+            @for (role of roles; track role.id) {
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  [checked]="isRoleSelected(role.id)"
+                  (change)="toggleRole(role.id)"
+                  class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                />
+                <span class="text-sm">
+                  <span class="font-medium">{{ role.name }}</span>
+                  @if (role.description) {
+                    <span class="text-gray-500"> - {{ role.description }}</span>
+                  }
+                </span>
+              </label>
+            }
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex gap-3 pt-4 border-t">
+          <button
+            type="submit"
+            [disabled]="editForm.invalid || loading()"
+            class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            @if (loading()) {
+              Saving...
+            } @else {
+              Save Changes
+            }
+          </button>
+          <button
+            type="button"
+            (click)="close.emit()"
+            class="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

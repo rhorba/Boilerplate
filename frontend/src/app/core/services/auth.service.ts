@@ -4,6 +4,7 @@ import { Observable, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { TokenService } from './token.service';
+import { UserResponse } from '../models/user.model';
 
 export interface LoginRequest {
   username: string;
@@ -23,31 +24,6 @@ export interface AuthResponse {
   tokenType: string;
   expiresIn: number;
   user: UserResponse;
-}
-
-export interface UserResponse {
-  id: number;
-  username: string;
-  email: string;
-  enabled: boolean;
-  roles: RoleResponse[];
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface RoleResponse {
-  id: number;
-  name: string;
-  description: string;
-  permissions: PermissionResponse[];
-}
-
-export interface PermissionResponse {
-  id: number;
-  name: string;
-  description: string;
-  resource: string;
-  action: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -110,3 +86,5 @@ export class AuthService {
     return user.roles.some(role => role.name === roleName);
   }
 }
+
+export { UserResponse, RoleResponse, PermissionResponse } from '../models/user.model';

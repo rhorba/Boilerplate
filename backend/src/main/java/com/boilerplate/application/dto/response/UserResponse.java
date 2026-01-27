@@ -18,6 +18,7 @@ public class UserResponse {
     private String email;
     private Boolean enabled;
     private Set<RoleResponse> roles;
+    private LocalDateTime deletedAt;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }
