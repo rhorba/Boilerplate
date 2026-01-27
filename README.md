@@ -9,8 +9,10 @@ Open-source enterprise-grade boilerplate featuring a decoupled monorepo architec
 - **Security**: Role-Based Access Control (RBAC) with permission-level granularity
 - **Authentication**: JWT with refresh tokens, self-registration with auto-login
 - **User Management**: Soft-delete, server-side search/filtering, bulk operations, slide-out edit panel
+- **User Profiles**: Extended profile management (bio, phone) linked to user accounts
+- **Audit Logging**: comprehensive system activity tracking with IP address and metadata support
 - **Architecture**: Hexagonal/Clean Architecture on backend, layer-based on frontend
-- **Database**: Flyway migrations (V1-V9), seeded data
+- **Database**: Flyway migrations (V1-V11), seeded data
 - **API Documentation**: SpringDoc OpenAPI (Swagger UI)
 - **Observability**: Logback JSON logging, Spring Actuator endpoints
 - **Code Quality**: Checkstyle, SpotBugs, JaCoCo (70% coverage), ESLint, Prettier
@@ -111,7 +113,7 @@ Access:
 /frontend                # Angular 18 frontend
 ├── src/app/
 │   ├── core/           # Services, guards, interceptors, models
-│   ├── features/       # Feature modules (auth, users, dashboard)
+│   ├── features/       # Feature modules (auth, users, profile, audit-logs, dashboard)
 │   └── services/       # API communication services
 └── package.json
 

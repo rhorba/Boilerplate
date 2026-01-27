@@ -5,7 +5,7 @@ Enterprise-grade boilerplate featuring a decoupled Monorepo architecture.
 - **Backend**: Spring Boot 3.4.1 (Java 21).
 - **Frontend**: Angular 18.2.0 Standalone.
 - **Architecture**: Strict Layered Hexagonal.
-- **Status**: 100% Complete with JWT auth, RBAC, and soft-delete user management.
+- **Status**: 100% Complete with JWT auth, RBAC, User Management, Audit Logging, and User Profiles.
 
 ## 2. Strict Engineering Rules
 - **Mapping**: MapStruct only. Manual mapping is prohibited.
