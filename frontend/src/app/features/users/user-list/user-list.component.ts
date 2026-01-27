@@ -271,6 +271,11 @@ export class UserListComponent implements OnInit {
 
   // --- Edit Panel ---
 
+  openCreatePanel(): void {
+    this.editingUser.set(null);
+    this.panelOpen.set(true);
+  }
+
   openEditPanel(user: UserResponse): void {
     this.editingUser.set(user);
     this.panelOpen.set(true);

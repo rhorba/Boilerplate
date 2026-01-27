@@ -3,7 +3,7 @@
   <div class="flex justify-between items-center mb-6">
     <h1 class="text-3xl font-bold dark:text-white">Users</h1>
     @if (authService.hasPermission('USER_CREATE')) {
-      <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+      <button (click)="openCreatePanel()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
         Add User
       </button>
     }
@@ -226,7 +226,7 @@
 <!-- Edit Panel Overlay -->
 @if (panelOpen()) {
   <app-user-edit-panel
-    [user]="editingUser()!"
+    [user]="editingUser()"
     [roles]="roles()"
     (close)="closeEditPanel()"
     (saved)="onUserUpdated()"

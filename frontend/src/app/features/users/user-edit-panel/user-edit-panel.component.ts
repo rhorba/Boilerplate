@@ -5,13 +5,19 @@ import {
   Input,
   OnInit,
   Output,
+  computed,
   inject,
   signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { UserService } from '../../../services/user.service';
-import { UserResponse, RoleResponse, UpdateUserRequest } from '../../../core/models/user.model';
+import {
+  UserResponse,
+  RoleResponse,
+  UpdateUserRequest,
+  CreateUserRequest,
+} from '../../../core/models/user.model';
 
 @Component({
   selector: 'app-user-edit-panel',
@@ -20,7 +26,7 @@ import { UserResponse, RoleResponse, UpdateUserRequest } from '../../../core/mod
   templateUrl: './user-edit-panel.component.html',
 })
 export class UserEditPanelComponent implements OnInit {
-  @Input({ required: true }) user!: UserResponse;
+  @Input() user: UserResponse | null = null;
   @Input() roles: RoleResponse[] = [];
   @Output() close = new EventEmitter<void>();
   @Output() saved = new EventEmitter<void>();
@@ -31,6 +37,7 @@ export class UserEditPanelComponent implements OnInit {
   loading = signal(false);
   error = signal<string | null>(null);
   showPassword = signal(false);
+  isCreateMode = computed(() => this.user === null);
 
   editForm = this.fb.nonNullable.group({
     username: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
@@ -41,12 +48,14 @@ export class UserEditPanelComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.editForm.patchValue({
-      username: this.user.username,
-      email: this.user.email,
-      enabled: this.user.enabled,
-      roleIds: this.user.roles.map((r) => r.id),
-    });
+    if (this.user) {
+      this.editForm.patchValue({
+        username: this.user.username,
+        email: this.user.email,
+        enabled: this.user.enabled,
+        roleIds: this.user.roles.map((r) => r.id),
+      });
+    }
   }
 
   @HostListener('document:keydown.escape')
@@ -71,39 +80,66 @@ export class UserEditPanelComponent implements OnInit {
   onSubmit(): void {
     if (this.editForm.invalid) return;
 
-    this.loading.set(true);
-    this.error.set(null);
-
     const formValue = this.editForm.getRawValue();
-    const request: UpdateUserRequest = {};
-
-    if (formValue.username !== this.user.username) request.username = formValue.username;
-    if (formValue.email !== this.user.email) request.email = formValue.email;
-    if (formValue.password) request.password = formValue.password;
-    if (formValue.enabled !== this.user.enabled) request.enabled = formValue.enabled;
-
-    const originalRoleIds = this.user.roles.map((r) => r.id).sort();
-    const newRoleIds = formValue.roleIds.sort();
-    if (JSON.stringify(originalRoleIds) !== JSON.stringify(newRoleIds)) {
-      request.roleIds = formValue.roleIds;
-    }
-
-    // Only send if there are changes
-    if (Object.keys(request).length === 0) {
-      this.close.emit();
+    if (this.isCreateMode() && !formValue.password) {
+      this.error.set('Password is required');
       return;
     }
 
-    this.userService.updateUser(this.user.id, request).subscribe({
-      next: () => {
-        this.loading.set(false);
-        this.saved.emit();
-      },
-      error: (err) => {
-        this.error.set(err.error?.message || 'Failed to update user');
-        this.loading.set(false);
-      },
-    });
+    this.loading.set(true);
+    this.error.set(null);
+
+    if (this.isCreateMode()) {
+      const request: CreateUserRequest = {
+        username: formValue.username,
+        email: formValue.email,
+        password: formValue.password,
+      };
+      const roleIds = formValue.roleIds;
+      if (roleIds.length > 0) {
+        request.roleIds = roleIds;
+      }
+
+      this.userService.createUser(request).subscribe({
+        next: () => {
+          this.loading.set(false);
+          this.saved.emit();
+        },
+        error: (err) => {
+          this.error.set(err.error?.message || 'Failed to create user');
+          this.loading.set(false);
+        },
+      });
+    } else {
+      const request: UpdateUserRequest = {};
+
+      if (formValue.username !== this.user!.username) request.username = formValue.username;
+      if (formValue.email !== this.user!.email) request.email = formValue.email;
+      if (formValue.password) request.password = formValue.password;
+      if (formValue.enabled !== this.user!.enabled) request.enabled = formValue.enabled;
+
+      const originalRoleIds = this.user!.roles.map((r) => r.id).sort();
+      const newRoleIds = formValue.roleIds.sort();
+      if (JSON.stringify(originalRoleIds) !== JSON.stringify(newRoleIds)) {
+        request.roleIds = formValue.roleIds;
+      }
+
+      if (Object.keys(request).length === 0) {
+        this.close.emit();
+        return;
+      }
+
+      this.userService.updateUser(this.user!.id, request).subscribe({
+        next: () => {
+          this.loading.set(false);
+          this.saved.emit();
+        },
+        error: (err) => {
+          this.error.set(err.error?.message || 'Failed to update user');
+          this.loading.set(false);
+        },
+      });
+    }
   }
 
   onOverlayClick(event: MouseEvent): void {
