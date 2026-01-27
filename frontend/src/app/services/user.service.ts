@@ -26,7 +26,8 @@ export class UserService {
 
     if (params.search) httpParams = httpParams.set('search', params.search);
     if (params.role) httpParams = httpParams.set('role', params.role);
-    if (params.enabled !== undefined) httpParams = httpParams.set('enabled', params.enabled.toString());
+    if (params.enabled !== undefined)
+      httpParams = httpParams.set('enabled', params.enabled.toString());
     if (params.showDeleted) httpParams = httpParams.set('showDeleted', 'true');
     if (params.sort) httpParams = httpParams.set('sort', params.sort);
 

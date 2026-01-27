@@ -36,23 +36,25 @@ export class AuthService {
   isAuthenticated = signal<boolean>(false);
 
   login(credentials: LoginRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${environment.apiUrl}/auth/login`, credentials)
-      .pipe(tap(response => {
+    return this.http.post<AuthResponse>(`${environment.apiUrl}/auth/login`, credentials).pipe(
+      tap((response) => {
         this.tokenService.setAccessToken(response.accessToken);
         this.tokenService.setRefreshToken(response.refreshToken);
         this.currentUser.set(response.user);
         this.isAuthenticated.set(true);
-      }));
+      })
+    );
   }
 
   register(data: RegisterRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${environment.apiUrl}/auth/register`, data)
-      .pipe(tap(response => {
+    return this.http.post<AuthResponse>(`${environment.apiUrl}/auth/register`, data).pipe(
+      tap((response) => {
         this.tokenService.setAccessToken(response.accessToken);
         this.tokenService.setRefreshToken(response.refreshToken);
         this.currentUser.set(response.user);
         this.isAuthenticated.set(true);
-      }));
+      })
+    );
   }
 
   logout(): void {
@@ -64,26 +66,30 @@ export class AuthService {
 
   refreshToken(): Observable<AuthResponse> {
     const refreshToken = this.tokenService.getRefreshToken();
-    return this.http.post<AuthResponse>(
-      `${environment.apiUrl}/auth/refresh`,
-      {},
-      { headers: { Authorization: `Bearer ${refreshToken}` } }
-    ).pipe(tap(response => {
-      this.tokenService.setAccessToken(response.accessToken);
-      this.currentUser.set(response.user);
-    }));
+    return this.http
+      .post<AuthResponse>(
+        `${environment.apiUrl}/auth/refresh`,
+        {},
+        { headers: { Authorization: `Bearer ${refreshToken}` } }
+      )
+      .pipe(
+        tap((response) => {
+          this.tokenService.setAccessToken(response.accessToken);
+          this.currentUser.set(response.user);
+        })
+      );
   }
 
   hasPermission(permission: string): boolean {
     const user = this.currentUser();
     if (!user) return false;
-    return user.roles.some(role => role.permissions.some(p => p.name === permission));
+    return user.roles.some((role) => role.permissions.some((p) => p.name === permission));
   }
 
   hasRole(roleName: string): boolean {
     const user = this.currentUser();
     if (!user) return false;
-    return user.roles.some(role => role.name === roleName);
+    return user.roles.some((role) => role.name === roleName);
   }
 }
 

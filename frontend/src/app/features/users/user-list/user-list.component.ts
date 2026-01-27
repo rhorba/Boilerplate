@@ -11,7 +11,7 @@ import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
   selector: 'app-user-list',
   standalone: true,
   imports: [CommonModule, FormsModule, UserEditPanelComponent],
-  templateUrl: './user-list.component.html'
+  templateUrl: './user-list.component.html',
 })
 export class UserListComponent implements OnInit {
   private userService = inject(UserService);
@@ -38,7 +38,7 @@ export class UserListComponent implements OnInit {
     const data = this.users();
     if (!data || data.content.length === 0) return false;
     const ids = this.selectedIds();
-    return data.content.every(u => ids.has(u.id));
+    return data.content.every((u) => ids.has(u.id));
   });
   selectionCount = computed(() => this.selectedIds().size);
 
@@ -54,10 +54,7 @@ export class UserListComponent implements OnInit {
     this.loadUsers();
     this.loadRoles();
 
-    this.searchSubject.pipe(
-      debounceTime(300),
-      distinctUntilChanged()
-    ).subscribe(term => {
+    this.searchSubject.pipe(debounceTime(300), distinctUntilChanged()).subscribe((term) => {
       this.searchTerm.set(term);
       this.page.set(0);
       this.loadUsers();
@@ -105,7 +102,7 @@ export class UserListComponent implements OnInit {
     const params: UserSearchParams = {
       page: this.page(),
       size: this.size(),
-      sort: `${this.sortField()},${this.sortDirection()}`
+      sort: `${this.sortField()},${this.sortDirection()}`,
     };
 
     if (this.searchTerm()) params.search = this.searchTerm();
@@ -122,28 +119,28 @@ export class UserListComponent implements OnInit {
         this.error.set('Failed to load users');
         this.loading.set(false);
         console.error(err);
-      }
+      },
     });
   }
 
   loadRoles(): void {
     this.userService.getRoles().subscribe({
       next: (roles) => this.roles.set(roles),
-      error: (err) => console.error('Failed to load roles', err)
+      error: (err) => console.error('Failed to load roles', err),
     });
   }
 
   nextPage(): void {
     const data = this.users();
     if (data && this.page() < data.totalPages - 1) {
-      this.page.update(p => p + 1);
+      this.page.update((p) => p + 1);
       this.loadUsers();
     }
   }
 
   previousPage(): void {
     if (this.page() > 0) {
-      this.page.update(p => p - 1);
+      this.page.update((p) => p - 1);
       this.loadUsers();
     }
   }
@@ -151,7 +148,7 @@ export class UserListComponent implements OnInit {
   // --- Selection ---
 
   toggleSelection(id: number): void {
-    this.selectedIds.update(ids => {
+    this.selectedIds.update((ids) => {
       const next = new Set(ids);
       if (next.has(id)) {
         next.delete(id);
@@ -167,15 +164,15 @@ export class UserListComponent implements OnInit {
     if (!data) return;
 
     if (this.allOnPageSelected()) {
-      this.selectedIds.update(ids => {
+      this.selectedIds.update((ids) => {
         const next = new Set(ids);
-        data.content.forEach(u => next.delete(u.id));
+        data.content.forEach((u) => next.delete(u.id));
         return next;
       });
     } else {
-      this.selectedIds.update(ids => {
+      this.selectedIds.update((ids) => {
         const next = new Set(ids);
-        data.content.forEach(u => next.add(u.id));
+        data.content.forEach((u) => next.add(u.id));
         return next;
       });
     }
@@ -199,7 +196,7 @@ export class UserListComponent implements OnInit {
       error: (err) => {
         alert('Failed to delete user');
         console.error(err);
-      }
+      },
     });
   }
 
@@ -209,7 +206,7 @@ export class UserListComponent implements OnInit {
       error: (err) => {
         alert('Failed to restore user');
         console.error(err);
-      }
+      },
     });
   }
 
@@ -222,7 +219,7 @@ export class UserListComponent implements OnInit {
       error: (err) => {
         alert('Failed to purge user');
         console.error(err);
-      }
+      },
     });
   }
 
@@ -240,7 +237,7 @@ export class UserListComponent implements OnInit {
       error: (err) => {
         alert(err.error?.message || 'Bulk delete failed');
         console.error(err);
-      }
+      },
     });
   }
 
@@ -254,7 +251,7 @@ export class UserListComponent implements OnInit {
       error: (err) => {
         alert('Bulk enable failed');
         console.error(err);
-      }
+      },
     });
   }
 
@@ -268,7 +265,7 @@ export class UserListComponent implements OnInit {
       error: (err) => {
         alert('Bulk disable failed');
         console.error(err);
-      }
+      },
     });
   }
 

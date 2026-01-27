@@ -1,4 +1,13 @@
-import { Component, EventEmitter, HostListener, Input, OnInit, Output, inject, signal } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  HostListener,
+  Input,
+  OnInit,
+  Output,
+  inject,
+  signal,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { UserService } from '../../../services/user.service';
@@ -8,7 +17,7 @@ import { UserResponse, RoleResponse, UpdateUserRequest } from '../../../core/mod
   selector: 'app-user-edit-panel',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './user-edit-panel.component.html'
+  templateUrl: './user-edit-panel.component.html',
 })
 export class UserEditPanelComponent implements OnInit {
   @Input({ required: true }) user!: UserResponse;
@@ -28,7 +37,7 @@ export class UserEditPanelComponent implements OnInit {
     email: ['', [Validators.required, Validators.email]],
     password: [''],
     enabled: [true],
-    roleIds: [[] as number[]]
+    roleIds: [[] as number[]],
   });
 
   ngOnInit(): void {
@@ -36,7 +45,7 @@ export class UserEditPanelComponent implements OnInit {
       username: this.user.username,
       email: this.user.email,
       enabled: this.user.enabled,
-      roleIds: this.user.roles.map(r => r.id)
+      roleIds: this.user.roles.map((r) => r.id),
     });
   }
 
@@ -73,7 +82,7 @@ export class UserEditPanelComponent implements OnInit {
     if (formValue.password) request.password = formValue.password;
     if (formValue.enabled !== this.user.enabled) request.enabled = formValue.enabled;
 
-    const originalRoleIds = this.user.roles.map(r => r.id).sort();
+    const originalRoleIds = this.user.roles.map((r) => r.id).sort();
     const newRoleIds = formValue.roleIds.sort();
     if (JSON.stringify(originalRoleIds) !== JSON.stringify(newRoleIds)) {
       request.roleIds = formValue.roleIds;
@@ -93,7 +102,7 @@ export class UserEditPanelComponent implements OnInit {
       error: (err) => {
         this.error.set(err.error?.message || 'Failed to update user');
         this.loading.set(false);
-      }
+      },
     });
   }
 

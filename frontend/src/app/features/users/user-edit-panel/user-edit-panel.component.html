@@ -4,11 +4,11 @@
   (click)="onOverlayClick($event)"
 >
   <!-- Slide-out Panel -->
-  <div class="fixed inset-y-0 right-0 w-full max-w-md bg-white shadow-xl z-50 overflow-y-auto">
+  <div class="fixed inset-y-0 right-0 w-full max-w-md bg-white dark:bg-gray-800 shadow-xl z-50 overflow-y-auto">
     <!-- Header -->
-    <div class="flex items-center justify-between px-6 py-4 border-b">
-      <h2 class="text-lg font-semibold">Edit User</h2>
-      <button (click)="close.emit()" class="text-gray-400 hover:text-gray-600">
+    <div class="flex items-center justify-between px-6 py-4 border-b dark:border-gray-700">
+      <h2 class="text-lg font-semibold dark:text-white">Edit User</h2>
+      <button (click)="close.emit()" class="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
@@ -18,13 +18,13 @@
     <!-- Body -->
     <div class="px-6 py-4">
       @if (error()) {
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+        <div class="bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-600 text-red-700 dark:text-red-400 px-4 py-3 rounded mb-4">
           {{ error() }}
         </div>
       }
 
       <!-- User Meta -->
-      <div class="mb-4 text-sm text-gray-500 space-y-1">
+      <div class="mb-4 text-sm text-gray-500 dark:text-gray-400 space-y-1">
         <p>ID: {{ user.id }}</p>
         <p>Created: {{ user.createdAt | date:'medium' }}</p>
         <p>Updated: {{ user.updatedAt | date:'medium' }}</p>
@@ -33,15 +33,15 @@
       <form [formGroup]="editForm" (ngSubmit)="onSubmit()" class="space-y-4">
         <!-- Username -->
         <div>
-          <label for="edit-username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+          <label for="edit-username" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Username</label>
           <input
             id="edit-username"
             type="text"
             formControlName="username"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           @if (editForm.get('username')?.touched && editForm.get('username')?.errors) {
-            <p class="mt-1 text-sm text-red-600">
+            <p class="mt-1 text-sm text-red-600 dark:text-red-400">
               @if (editForm.get('username')?.errors?.['required']) {
                 Username is required.
               } @else if (editForm.get('username')?.errors?.['minlength']) {
@@ -53,22 +53,22 @@
 
         <!-- Email -->
         <div>
-          <label for="edit-email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+          <label for="edit-email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
           <input
             id="edit-email"
             type="email"
             formControlName="email"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           @if (editForm.get('email')?.touched && editForm.get('email')?.errors) {
-            <p class="mt-1 text-sm text-red-600">Please enter a valid email address.</p>
+            <p class="mt-1 text-sm text-red-600 dark:text-red-400">Please enter a valid email address.</p>
           }
         </div>
 
         <!-- Password (optional) -->
         <div>
-          <label for="edit-password" class="block text-sm font-medium text-gray-700 mb-1">
-            New Password <span class="text-gray-400">(leave blank to keep current)</span>
+          <label for="edit-password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            New Password <span class="text-gray-400 dark:text-gray-500">(leave blank to keep current)</span>
           </label>
           <div class="relative">
             <input
@@ -76,12 +76,12 @@
               [type]="showPassword() ? 'text' : 'password'"
               formControlName="password"
               placeholder="Enter new password"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
             />
             <button
               type="button"
               (click)="showPassword.set(!showPassword())"
-              class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-700"
+              class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
             >
               {{ showPassword() ? 'Hide' : 'Show' }}
             </button>
@@ -96,14 +96,14 @@
               formControlName="enabled"
               class="sr-only peer"
             />
-            <div class="w-11 h-6 bg-gray-200 peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+            <div class="w-11 h-6 bg-gray-200 peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
           </label>
-          <span class="text-sm font-medium text-gray-700">Account Enabled</span>
+          <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Account Enabled</span>
         </div>
 
         <!-- Roles -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Roles</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Roles</label>
           <div class="space-y-2">
             @for (role of roles; track role.id) {
               <label class="flex items-center gap-2 cursor-pointer">
@@ -113,10 +113,10 @@
                   (change)="toggleRole(role.id)"
                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                 />
-                <span class="text-sm">
+                <span class="text-sm dark:text-gray-300">
                   <span class="font-medium">{{ role.name }}</span>
                   @if (role.description) {
-                    <span class="text-gray-500"> - {{ role.description }}</span>
+                    <span class="text-gray-500 dark:text-gray-400"> - {{ role.description }}</span>
                   }
                 </span>
               </label>
@@ -125,7 +125,7 @@
         </div>
 
         <!-- Actions -->
-        <div class="flex gap-3 pt-4 border-t">
+        <div class="flex gap-3 pt-4 border-t dark:border-gray-700">
           <button
             type="submit"
             [disabled]="editForm.invalid || loading()"
@@ -140,7 +140,7 @@
           <button
             type="button"
             (click)="close.emit()"
-            class="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
+            class="px-4 py-2 border border-gray-300 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 rounded-md hover:bg-gray-50"
           >
             Cancel
           </button>

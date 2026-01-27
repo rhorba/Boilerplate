@@ -8,7 +8,7 @@ import { AuthService } from '../../../core/services/auth.service';
   selector: 'app-login',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
-  templateUrl: './login.component.html'
+  templateUrl: './login.component.html',
 })
 export class LoginComponent {
   private fb = inject(FormBuilder);
@@ -21,7 +21,7 @@ export class LoginComponent {
   loginForm = this.fb.nonNullable.group({
     username: ['', [Validators.required]],
     password: ['', [Validators.required]],
-    rememberMe: [false]
+    rememberMe: [false],
   });
 
   onSubmit(): void {
@@ -37,7 +37,7 @@ export class LoginComponent {
       error: (err) => {
         this.error.set(err.error?.message || 'Login failed');
         this.loading.set(false);
-      }
+      },
     });
   }
 }
