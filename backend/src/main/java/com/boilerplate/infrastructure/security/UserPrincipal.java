@@ -1,5 +1,6 @@
 package com.boilerplate.infrastructure.security;
 
+import com.boilerplate.domain.model.Group;
 import com.boilerplate.domain.model.Permission;
 import com.boilerplate.domain.model.Role;
 import com.boilerplate.domain.model.User;
@@ -23,13 +24,15 @@ public class UserPrincipal implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Set<GrantedAuthority> authorities = new HashSet<>();
 
-        // Add role-based authorities
-        for (Role role : user.getRoles()) {
-            authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getName()));
+        // Flatten roles from all groups
+        for (Group group : user.getGroups()) {
+            for (Role role : group.getRoles()) {
+                authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getName()));
 
-            // Add permission-based authorities
-            for (Permission permission : role.getPermissions()) {
-                authorities.add(new SimpleGrantedAuthority(permission.getName()));
+                // Add permission-based authorities
+                for (Permission permission : role.getPermissions()) {
+                    authorities.add(new SimpleGrantedAuthority(permission.getName()));
+                }
             }
         }
 

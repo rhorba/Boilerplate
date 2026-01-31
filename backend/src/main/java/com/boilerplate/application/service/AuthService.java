@@ -5,8 +5,10 @@ import com.boilerplate.application.dto.request.RegisterRequest;
 import com.boilerplate.application.dto.response.AuthResponse;
 import com.boilerplate.application.dto.response.UserResponse;
 import com.boilerplate.application.mapper.UserMapper;
+import com.boilerplate.domain.model.Group;
 import com.boilerplate.domain.model.Role;
 import com.boilerplate.domain.model.User;
+import com.boilerplate.domain.repository.GroupRepository;
 import com.boilerplate.domain.repository.RoleRepository;
 import com.boilerplate.domain.repository.UserRepository;
 import com.boilerplate.infrastructure.security.JwtService;
@@ -33,6 +35,7 @@ public class AuthService {
     private final UserDetailsService userDetailsService;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final GroupRepository groupRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final UserMapper userMapper;
@@ -125,10 +128,21 @@ public class AuthService {
             .accountNonExpired(true)
             .accountNonLocked(true)
             .credentialsNonExpired(true)
-            .roles(Set.of(userRole))
             .build();
 
-        userRepository.save(user);
+        User savedUser = userRepository.save(user);
+
+        // Create personal group for the new user
+        Group personalGroup = Group.builder()
+            .name("personal_" + savedUser.getUsername())
+            .description("Personal group for " + savedUser.getUsername())
+            .roles(Set.of(userRole))
+            .build();
+        Group savedGroup = groupRepository.save(personalGroup);
+
+        // Assign user to their personal group
+        savedUser.getGroups().add(savedGroup);
+        userRepository.save(savedUser);
 
         Authentication authentication = authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())

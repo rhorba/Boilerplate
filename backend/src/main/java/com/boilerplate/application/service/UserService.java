@@ -5,8 +5,10 @@ import com.boilerplate.application.dto.request.UpdateUserRequest;
 import com.boilerplate.application.dto.request.UserSearchRequest;
 import com.boilerplate.application.dto.response.UserResponse;
 import com.boilerplate.application.mapper.UserMapper;
+import com.boilerplate.domain.model.Group;
 import com.boilerplate.domain.model.Role;
 import com.boilerplate.domain.model.User;
+import com.boilerplate.domain.repository.GroupRepository;
 import com.boilerplate.domain.repository.RoleRepository;
 import com.boilerplate.domain.repository.UserRepository;
 import com.boilerplate.domain.repository.UserSpecification;
@@ -32,6 +34,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final GroupRepository groupRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final AuditPublisher auditPublisher;
@@ -102,15 +105,28 @@ public class UserService {
         User user = userMapper.toEntity(request);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 
+        User savedUser = userRepository.save(user);
+
+        // Create personal group for the new user with requested roles
+        Set<Role> roles;
         if (request.getRoleIds() != null && !request.getRoleIds().isEmpty()) {
-            Set<Role> roles = roleRepository.findAllByIdWithPermissions(request.getRoleIds());
-            user.setRoles(roles);
+            roles = roleRepository.findAllByIdWithPermissions(request.getRoleIds());
         } else {
-            roleRepository.findByName("USER")
-                .ifPresent(role -> user.setRoles(Set.of(role)));
+            Role userRole = roleRepository.findByName("USER")
+                .orElseThrow(() -> new RuntimeException("Default USER role not found"));
+            roles = Set.of(userRole);
         }
 
-        User savedUser = userRepository.save(user);
+        Group personalGroup = Group.builder()
+            .name("personal_" + savedUser.getUsername())
+            .description("Personal group for " + savedUser.getUsername())
+            .roles(roles)
+            .build();
+        Group savedGroup = groupRepository.save(personalGroup);
+
+        // Assign user to their personal group
+        savedUser.getGroups().add(savedGroup);
+        savedUser = userRepository.save(savedUser);
         log.info("User created successfully: {}", savedUser.getUsername());
 
         auditPublisher.publish(
@@ -149,9 +165,19 @@ public class UserService {
             user.setPassword(passwordEncoder.encode(request.getPassword()));
         }
 
+        // Update roles in user's personal group if provided
         if (request.getRoleIds() != null) {
             Set<Role> roles = roleRepository.findAllByIdWithPermissions(request.getRoleIds());
-            user.setRoles(roles);
+            // Find user's personal group and update its roles
+            Group personalGroup = user.getGroups().stream()
+                .filter(g -> g.getName().equals("personal_" + user.getUsername()))
+                .findFirst()
+                .orElse(null);
+
+            if (personalGroup != null) {
+                personalGroup.setRoles(roles);
+                groupRepository.save(personalGroup);
+            }
         }
 
         User updatedUser = userRepository.save(user);
@@ -232,12 +258,14 @@ public class UserService {
     public int bulkSoftDelete(List<Long> ids) {
         log.debug("Bulk soft-deleting users: {}", ids);
 
-        long adminCount = userRepository.countByDeletedAtIsNullAndRolesName("ADMIN");
+        long adminCount = userRepository.countByDeletedAtIsNullAndGroupsRolesName("ADMIN");
         long adminsInBatch = ids.stream()
             .map(userRepository::findById)
             .flatMap(java.util.Optional::stream)
             .filter(u -> u.getDeletedAt() == null)
-            .filter(u -> u.getRoles().stream().anyMatch(r -> "ADMIN".equals(r.getName())))
+            .filter(u -> u.getGroups().stream()
+                .flatMap(g -> g.getRoles().stream())
+                .anyMatch(r -> "ADMIN".equals(r.getName())))
             .count();
 
         if (adminCount > 0 && adminCount <= adminsInBatch) {

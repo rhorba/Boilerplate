@@ -11,11 +11,12 @@ public interface UserMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "password", ignore = true)  // Handled separately with encoding
-    @Mapping(target = "roles", ignore = true)  // Handled separately
+    @Mapping(target = "groups", ignore = true)  // Handled separately
     @Mapping(target = "enabled", constant = "true")
     @Mapping(target = "accountNonExpired", constant = "true")
     @Mapping(target = "accountNonLocked", constant = "true")
     @Mapping(target = "credentialsNonExpired", constant = "true")
+    @Mapping(target = "deletedAt", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "version", ignore = true)
@@ -23,10 +24,11 @@ public interface UserMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "password", ignore = true)  // Only update if provided
-    @Mapping(target = "roles", ignore = true)  // Handled separately
+    @Mapping(target = "groups", ignore = true)  // Handled separately
     @Mapping(target = "accountNonExpired", ignore = true)
     @Mapping(target = "accountNonLocked", ignore = true)
     @Mapping(target = "credentialsNonExpired", ignore = true)
+    @Mapping(target = "deletedAt", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "version", ignore = true)

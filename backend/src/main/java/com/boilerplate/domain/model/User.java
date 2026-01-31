@@ -44,12 +44,12 @@ public class User extends BaseEntity {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-        name = "user_roles",
+        name = "user_groups",
         joinColumns = @JoinColumn(name = "user_id"),
-        inverseJoinColumns = @JoinColumn(name = "role_id")
+        inverseJoinColumns = @JoinColumn(name = "group_id")
     )
     @Builder.Default
-    private Set<Role> roles = new HashSet<>();
+    private Set<Group> groups = new HashSet<>();
 }

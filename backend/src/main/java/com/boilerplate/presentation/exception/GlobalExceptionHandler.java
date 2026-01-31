@@ -40,6 +40,16 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(HttpStatus.CONFLICT, ex.getMessage(), request.getRequestURI());
     }
 
+    @ExceptionHandler(GroupHasUsersException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handleGroupHasUsersException(
+        GroupHasUsersException ex,
+        HttpServletRequest request
+    ) {
+        log.error("Group has users: {}", ex.getMessage());
+        return buildErrorResponse(HttpStatus.CONFLICT, ex.getMessage(), request.getRequestURI());
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleValidationExceptions(
