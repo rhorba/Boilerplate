@@ -8,7 +8,8 @@ public record GroupResponse(
     String name,
     String description,
     Set<RoleResponse> roles,
+    Set<UserSummary> users,  // Optional, populated in detail view
     Integer userCount,
     LocalDateTime createdAt,
     LocalDateTime updatedAt
-) {}
+) { }

@@ -2,11 +2,19 @@ package com.boilerplate.application.mapper;
 
 import com.boilerplate.application.dto.request.CreateUserRequest;
 import com.boilerplate.application.dto.request.UpdateUserRequest;
+import com.boilerplate.application.dto.response.RoleResponse;
 import com.boilerplate.application.dto.response.UserResponse;
 import com.boilerplate.domain.model.User;
-import org.mapstruct.*;
+import org.mapstruct.BeanMapping;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 
-@Mapper(componentModel = "spring", uses = {RoleMapper.class})
+import java.util.Set;
+import java.util.stream.Collectors;
+
+@Mapper(componentModel = "spring", uses = {RoleMapper.class, GroupMapper.class})
 public interface UserMapper {
 
     @Mapping(target = "id", ignore = true)
@@ -35,5 +43,20 @@ public interface UserMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateEntity(@MappingTarget User user, UpdateUserRequest request);
 
+    @Mapping(target = "roles", expression = "java(extractRolesFromGroups(user))")
+    @Mapping(target = "groups", source = "groups")
     UserResponse toResponse(User user);
+
+    default Set<RoleResponse> extractRolesFromGroups(User user) {
+        return user.getGroups().stream()
+            .flatMap(group -> group.getRoles().stream())
+            .distinct()
+            .map(role -> new RoleResponse(
+                role.getId(),
+                role.getName(),
+                role.getDescription(),
+                null  // Skip permissions for brevity in user response
+            ))
+            .collect(Collectors.toSet());
+    }
 }

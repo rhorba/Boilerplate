@@ -39,7 +39,7 @@ public class GroupService {
 
     @Transactional(readOnly = true)
     public GroupResponse getGroupById(Long id) {
-        Group group = groupRepository.findByIdWithRoles(id)
+        Group group = groupRepository.findByIdWithRolesAndUsers(id)
             .orElseThrow(() -> new ResourceNotFoundException("Group not found with id: " + id));
         return groupMapper.toResponse(group);
     }
@@ -111,7 +111,7 @@ public class GroupService {
 
     @Transactional
     public GroupResponse assignUsersToGroup(Long groupId, GroupAssignUsersRequest request) {
-        Group group = groupRepository.findByIdWithRoles(groupId)
+        Group group = groupRepository.findByIdWithRolesAndUsers(groupId)
             .orElseThrow(() -> new ResourceNotFoundException("Group not found with id: " + groupId));
 
         List<User> users = userRepository.findAllById(request.userIds());

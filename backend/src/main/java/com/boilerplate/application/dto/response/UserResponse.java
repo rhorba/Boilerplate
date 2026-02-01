@@ -17,7 +17,8 @@ public class UserResponse {
     private String username;
     private String email;
     private Boolean enabled;
-    private Set<RoleResponse> roles;
+    private Set<RoleResponse> roles;  // Keep for backward compatibility - computed from groups
+    private Set<GroupResponse> groups;  // New field - primary source
     private LocalDateTime deletedAt;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

@@ -29,6 +29,34 @@ export const routes: Routes = [
           import('./features/users/user-list/user-list.component').then((m) => m.UserListComponent),
       },
       {
+        path: 'groups',
+        loadComponent: () =>
+          import('./features/groups/group-list/group-list.component').then(
+            (m) => m.GroupListComponent
+          ),
+      },
+      {
+        path: 'groups/create',
+        loadComponent: () =>
+          import('./features/groups/group-form/group-form.component').then(
+            (m) => m.GroupFormComponent
+          ),
+      },
+      {
+        path: 'groups/edit/:id',
+        loadComponent: () =>
+          import('./features/groups/group-form/group-form.component').then(
+            (m) => m.GroupFormComponent
+          ),
+      },
+      {
+        path: 'groups/:id/users',
+        loadComponent: () =>
+          import('./features/groups/group-users/group-users.component').then(
+            (m) => m.GroupUsersComponent
+          ),
+      },
+      {
         path: 'audit-logs',
         loadComponent: () =>
           import('./features/audit-logs/audit-log-list/audit-log-list.component').then(

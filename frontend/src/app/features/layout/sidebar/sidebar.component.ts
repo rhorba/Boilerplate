@@ -25,6 +25,7 @@ export class SidebarComponent {
   navItems: NavItem[] = [
     { label: 'Dashboard', icon: 'dashboard', route: '/dashboard' },
     { label: 'Users', icon: 'people', route: '/users', permission: 'USER_READ' },
+    { label: 'Groups', icon: 'group', route: '/groups', permission: 'SYSTEM_MANAGE' },
     { label: 'Audit Logs', icon: 'history', route: '/audit-logs', permission: 'SYSTEM_MANAGE' },
     { label: 'Settings', icon: 'settings', route: '/settings' },
   ];

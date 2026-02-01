@@ -1,9 +1,12 @@
+import { GroupResponse } from './group.model';
+
 export interface UserResponse {
   id: number;
   username: string;
   email: string;
   enabled: boolean;
-  roles: RoleResponse[];
+  roles: RoleResponse[]; // Keep for backward compatibility - computed from groups
+  groups: GroupResponse[]; // New field - primary source
   deletedAt: string | null;
   createdAt: string;
   updatedAt: string;
