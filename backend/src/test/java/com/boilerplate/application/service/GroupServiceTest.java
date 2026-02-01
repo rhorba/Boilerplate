@@ -55,7 +55,7 @@ class GroupServiceTest {
         GroupRequest request = new GroupRequest("Engineering", "Engineering team", Set.of(1L));
         Group group = Group.builder().name("Engineering").description("Engineering team").build();
         GroupResponse response = new GroupResponse(
-            1L, "Engineering", "Engineering team", Set.of(), 0, null, null
+            1L, "Engineering", "Engineering team", Set.of(), Set.of(), 0, null, null
         );
         Role role = Role.builder().id(1L).name("DEVELOPER").build();
 
@@ -98,7 +98,7 @@ class GroupServiceTest {
             .roles(new HashSet<>())
             .build();
         GroupResponse response = new GroupResponse(
-            groupId, "Updated Name", "Updated description", Set.of(), 0, null, null
+            groupId, "Updated Name", "Updated description", Set.of(), Set.of(), 0, null, null
         );
         Role role = Role.builder().id(1L).name("DEVELOPER").build();
 
@@ -150,7 +150,7 @@ class GroupServiceTest {
         User user1 = User.builder().id(1L).username("user1").groups(new HashSet<>()).build();
         User user2 = User.builder().id(2L).username("user2").groups(new HashSet<>()).build();
         GroupResponse response = new GroupResponse(
-            groupId, "Engineering", "Eng team", Set.of(), 2, null, null
+            groupId, "Engineering", "Eng team", Set.of(), Set.of(), 2, null, null
         );
 
         when(groupRepository.findByIdWithRoles(groupId)).thenReturn(Optional.of(group));

@@ -51,12 +51,25 @@ public interface UserMapper {
         return user.getGroups().stream()
             .flatMap(group -> group.getRoles().stream())
             .distinct()
-            .map(role -> new RoleResponse(
-                role.getId(),
-                role.getName(),
-                role.getDescription(),
-                null  // Skip permissions for brevity in user response
-            ))
+            .map(role -> {
+                Set<com.boilerplate.application.dto.response.PermissionResponse> permissions =
+                    role.getPermissions().stream()
+                        .map(permission -> new com.boilerplate.application.dto.response.PermissionResponse(
+                            permission.getId(),
+                            permission.getName(),
+                            permission.getDescription(),
+                            permission.getResource().name(),
+                            permission.getAction().name()
+                        ))
+                        .collect(Collectors.toSet());
+
+                return new RoleResponse(
+                    role.getId(),
+                    role.getName(),
+                    role.getDescription(),
+                    permissions
+                );
+            })
             .collect(Collectors.toSet());
     }
 }

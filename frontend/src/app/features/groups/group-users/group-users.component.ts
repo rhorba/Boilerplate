@@ -69,7 +69,7 @@ export class GroupUsersComponent implements OnInit {
   updateAvailableUsers(): void {
     if (!this.group) return;
 
-    const groupUserIds = (this.group as any).users?.map((u: any) => u.id) || [];
+    const groupUserIds = this.group.users?.map((u) => u.id) || [];
     this.availableUsers = this.allUsers.filter((user) => !groupUserIds.includes(user.id));
   }
 
