@@ -8,11 +8,11 @@ Open-source enterprise-grade boilerplate featuring a decoupled monorepo architec
 - **Frontend**: Angular 18, TanStack Query, Tailwind CSS, Signals
 - **Security**: Role-Based Access Control (RBAC) with permission-level granularity
 - **Authentication**: JWT with refresh tokens, self-registration with auto-login
-- **User Management**: Soft-delete, server-side search/filtering, bulk operations, slide-out edit panel
+- **User Management**: Group-based role assignment, soft-delete, server-side search/filtering, bulk operations, slide-out edit panel
 - **User Profiles**: Extended profile management (bio, phone) linked to user accounts
 - **Audit Logging**: comprehensive system activity tracking with IP address and metadata support
 - **Architecture**: Hexagonal/Clean Architecture on backend, layer-based on frontend
-- **Database**: Flyway migrations (V1-V11), seeded data
+- **Database**: Flyway migrations (V1-V16), seeded data
 - **API Documentation**: SpringDoc OpenAPI (Swagger UI)
 - **Observability**: Logback JSON logging, Spring Actuator endpoints
 - **Code Quality**: Checkstyle, SpotBugs, JaCoCo (70% coverage), ESLint, Prettier
@@ -106,7 +106,7 @@ Access:
 │   ├── infrastructure/  # Security, persistence, configs
 │   └── presentation/    # REST controllers, exception handlers
 ├── src/main/resources/
-│   ├── db/migration/    # Flyway SQL migrations (V1-V9)
+│   ├── db/migration/    # Flyway SQL migrations (V1-V16)
 │   └── application*.yml # Configuration files
 └── pom.xml
 
@@ -130,6 +130,30 @@ Access Swagger UI at: `http://localhost:8080/swagger-ui.html`
 | Username | Password   | Role      |
 |----------|------------|-----------|
 | admin    | admin123   | ADMIN     |
+
+## User Management Workflow
+
+### Creating Users
+- Admin creates users with username, email, and password
+- New users automatically join the **"Default Users"** group with USER role
+- Role assignment happens exclusively through group membership
+- No direct role selection during user creation
+
+### Managing Roles
+1. Navigate to **Groups** page
+2. Create groups and assign roles to groups
+3. Add users to groups to grant permissions
+4. Users inherit all permissions from their assigned groups
+
+### Default Groups
+- **Default Users**: All new users automatically join this group with USER role
+- **Custom Groups**: Create additional groups for specific role combinations (e.g., "Moderators", "Content Editors")
+
+### Key Changes (v16+)
+- **Breaking Change**: `POST /api/users` and `PUT /api/users/{id}` no longer accept `roleIds` parameter
+- Role management moved exclusively to group assignment endpoints
+- Use group management UI or `POST /api/groups/{id}/users` to assign users to groups
+- Existing personal groups (`personal_username`) remain functional for backwards compatibility
 
 ## Available Permissions
 
