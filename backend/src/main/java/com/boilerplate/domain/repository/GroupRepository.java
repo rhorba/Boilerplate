@@ -22,4 +22,6 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
     List<Group> findAllWithRolesAndUsers();
 
     boolean existsByName(String name);
+
+    Optional<Group> findByName(String name);
 }
