@@ -3,10 +3,7 @@
     {{ isEditMode ? 'Edit Group' : 'Create Group' }}
   </h1>
 
-  <div
-    *ngIf="error"
-    class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4"
-  >
+  <div *ngIf="error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
     {{ error }}
   </div>
 
@@ -24,14 +21,10 @@
         type="text"
         formControlName="name"
         class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-        [class.border-red-500]="
-          groupForm.get('name')?.invalid && groupForm.get('name')?.touched
-        "
+        [class.border-red-500]="groupForm.get('name')?.invalid && groupForm.get('name')?.touched"
       />
       <p
-        *ngIf="
-          groupForm.get('name')?.invalid && groupForm.get('name')?.touched
-        "
+        *ngIf="groupForm.get('name')?.invalid && groupForm.get('name')?.touched"
         class="text-red-500 text-xs italic mt-1"
       >
         Name is required and must not exceed 100 characters.
@@ -39,10 +32,7 @@
     </div>
 
     <div class="mb-4">
-      <label
-        class="block text-gray-700 text-sm font-bold mb-2"
-        for="description"
-      >
+      <label class="block text-gray-700 text-sm font-bold mb-2" for="description">
         Description
       </label>
       <textarea
@@ -51,15 +41,11 @@
         rows="3"
         class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
         [class.border-red-500]="
-          groupForm.get('description')?.invalid &&
-          groupForm.get('description')?.touched
+          groupForm.get('description')?.invalid && groupForm.get('description')?.touched
         "
       ></textarea>
       <p
-        *ngIf="
-          groupForm.get('description')?.invalid &&
-          groupForm.get('description')?.touched
-        "
+        *ngIf="groupForm.get('description')?.invalid && groupForm.get('description')?.touched"
         class="text-red-500 text-xs italic mt-1"
       >
         Description must not exceed 255 characters.

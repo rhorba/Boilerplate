@@ -10,18 +10,13 @@
     <p class="text-gray-600">Loading...</p>
   </div>
 
-  <div
-    *ngIf="error"
-    class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4"
-  >
+  <div *ngIf="error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
     {{ error }}
   </div>
 
   <div *ngIf="!loading && group" class="bg-white shadow-md rounded">
     <div class="p-4 border-b flex justify-between items-center">
-      <h2 class="text-xl font-semibold">
-        Group Members ({{ group.userCount }})
-      </h2>
+      <h2 class="text-xl font-semibold">Group Members ({{ group.userCount }})</h2>
       <button
         (click)="openAddUsersModal()"
         class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
@@ -33,21 +28,9 @@
     <table class="min-w-full" *ngIf="group.users && group.users.length > 0">
       <thead class="bg-gray-100">
         <tr>
-          <th
-            class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase"
-          >
-            Username
-          </th>
-          <th
-            class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase"
-          >
-            Email
-          </th>
-          <th
-            class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase"
-          >
-            Actions
-          </th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Username</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Email</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Actions</th>
         </tr>
       </thead>
       <tbody class="divide-y divide-gray-200">
@@ -66,10 +49,7 @@
       </tbody>
     </table>
 
-    <div
-      *ngIf="!group.users || group.users.length === 0"
-      class="text-center py-8 text-gray-500"
-    >
+    <div *ngIf="!group.users || group.users.length === 0" class="text-center py-8 text-gray-500">
       No users in this group. Add users to get started.
     </div>
   </div>
@@ -84,19 +64,11 @@
     >
       <div class="flex justify-between items-center mb-4">
         <h3 class="text-xl font-bold">Add Users to Group</h3>
-        <button
-          (click)="closeAddUsersModal()"
-          class="text-gray-600 hover:text-gray-900"
-        >
-          ✕
-        </button>
+        <button (click)="closeAddUsersModal()" class="text-gray-600 hover:text-gray-900">✕</button>
       </div>
 
       <div class="max-h-96 overflow-y-auto">
-        <div
-          *ngFor="let user of availableUsers"
-          class="flex items-center py-2 border-b"
-        >
+        <div *ngFor="let user of availableUsers" class="flex items-center py-2 border-b">
           <input
             type="checkbox"
             [id]="'user-' + user.id"
@@ -110,10 +82,7 @@
           </label>
         </div>
 
-        <div
-          *ngIf="availableUsers.length === 0"
-          class="text-center py-8 text-gray-500"
-        >
+        <div *ngIf="availableUsers.length === 0" class="text-center py-8 text-gray-500">
           All users are already in this group.
         </div>
       </div>

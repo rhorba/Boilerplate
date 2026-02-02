@@ -83,8 +83,8 @@ export class AuthService {
   hasPermission(permission: string): boolean {
     const user = this.currentUser();
     if (!user || !user.roles) return false;
-    return user.roles.some((role) =>
-      role.permissions && role.permissions.some((p) => p.name === permission)
+    return user.roles.some(
+      (role) => role.permissions && role.permissions.some((p) => p.name === permission)
     );
   }
 
