@@ -4,8 +4,10 @@ import com.boilerplate.application.dto.request.RegisterRequest;
 import com.boilerplate.application.dto.response.AuthResponse;
 import com.boilerplate.application.dto.response.UserResponse;
 import com.boilerplate.application.mapper.UserMapper;
+import com.boilerplate.domain.model.Group;
 import com.boilerplate.domain.model.Role;
 import com.boilerplate.domain.model.User;
+import com.boilerplate.domain.repository.GroupRepository;
 import com.boilerplate.domain.repository.RoleRepository;
 import com.boilerplate.domain.repository.UserRepository;
 import com.boilerplate.infrastructure.security.JwtService;
@@ -45,6 +47,9 @@ class AuthServiceTest {
     private RoleRepository roleRepository;
 
     @Mock
+    private GroupRepository groupRepository;
+
+    @Mock
     private PasswordEncoder passwordEncoder;
 
     @Mock
@@ -53,6 +58,9 @@ class AuthServiceTest {
     @Mock
     private UserMapper userMapper;
 
+    @Mock
+    private AuditPublisher auditPublisher;
+
     @InjectMocks
     private AuthService authService;
 
@@ -60,6 +68,7 @@ class AuthServiceTest {
     private User savedUser;
     private UserResponse userResponse;
     private Role userRole;
+    private Group defaultGroup;
 
     @BeforeEach
     void setUp() {
@@ -72,6 +81,12 @@ class AuthServiceTest {
         userRole = new Role();
         userRole.setId(2L);
         userRole.setName("USER");
+
+        defaultGroup = Group.builder()
+            .id(1L)
+            .name("Default Users")
+            .description("Default group for new users")
+            .build();
 
         savedUser = User.builder()
             .id(2L)
@@ -94,7 +109,7 @@ class AuthServiceTest {
         // Arrange
         when(userRepository.existsByUsernameAndDeletedAtIsNull("newuser")).thenReturn(false);
         when(userRepository.existsByEmailAndDeletedAtIsNull("new@example.com")).thenReturn(false);
-        when(roleRepository.findByName("USER")).thenReturn(Optional.of(userRole));
+        when(groupRepository.findByName("Default Users")).thenReturn(Optional.of(defaultGroup));
         when(passwordEncoder.encode("password123")).thenReturn("encodedPassword");
         when(userRepository.save(any(User.class))).thenReturn(savedUser);
 
@@ -120,7 +135,8 @@ class AuthServiceTest {
         assertThat(result.getTokenType()).isEqualTo("Bearer");
         assertThat(result.getExpiresIn()).isEqualTo(900L);
         assertThat(result.getUser().getUsername()).isEqualTo("newuser");
-        verify(userRepository).save(any(User.class));
+        verify(groupRepository).findByName("Default Users");
+        verify(userRepository, times(2)).save(any(User.class));
     }
 
     @Test

@@ -4,8 +4,10 @@ import com.boilerplate.application.dto.request.CreateUserRequest;
 import com.boilerplate.application.dto.request.UserSearchRequest;
 import com.boilerplate.application.dto.response.UserResponse;
 import com.boilerplate.application.mapper.UserMapper;
+import com.boilerplate.domain.model.Group;
 import com.boilerplate.domain.model.Role;
 import com.boilerplate.domain.model.User;
+import com.boilerplate.domain.repository.GroupRepository;
 import com.boilerplate.domain.repository.RoleRepository;
 import com.boilerplate.domain.repository.UserRepository;
 import com.boilerplate.presentation.exception.DuplicateResourceException;
@@ -40,10 +42,16 @@ class UserServiceTest {
     private RoleRepository roleRepository;
 
     @Mock
+    private GroupRepository groupRepository;
+
+    @Mock
     private UserMapper userMapper;
 
     @Mock
     private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private AuditPublisher auditPublisher;
 
     @InjectMocks
     private UserService userService;
@@ -51,6 +59,7 @@ class UserServiceTest {
     private User testUser;
     private UserResponse testUserResponse;
     private CreateUserRequest createRequest;
+    private Group defaultGroup;
 
     @BeforeEach
     void setUp() {
@@ -74,6 +83,12 @@ class UserServiceTest {
             .email("new@example.com")
             .password("password123")
             .build();
+
+        defaultGroup = Group.builder()
+            .id(1L)
+            .name("Default Users")
+            .description("Default group for new users")
+            .build();
     }
 
     @Test
@@ -83,7 +98,7 @@ class UserServiceTest {
         when(userRepository.existsByEmailAndDeletedAtIsNull(anyString())).thenReturn(false);
         when(userMapper.toEntity(any())).thenReturn(testUser);
         when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
-        when(roleRepository.findByName("USER")).thenReturn(Optional.of(new Role()));
+        when(groupRepository.findByName("Default Users")).thenReturn(Optional.of(defaultGroup));
         when(userRepository.save(any(User.class))).thenReturn(testUser);
         when(userMapper.toResponse(any())).thenReturn(testUserResponse);
 
@@ -93,7 +108,8 @@ class UserServiceTest {
         // Assert
         assertThat(result).isNotNull();
         assertThat(result.getUsername()).isEqualTo("testuser");
-        verify(userRepository).save(any(User.class));
+        verify(groupRepository).findByName("Default Users");
+        verify(userRepository, times(2)).save(any(User.class));
     }
 
     @Test

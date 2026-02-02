@@ -153,7 +153,7 @@ class GroupServiceTest {
             groupId, "Engineering", "Eng team", Set.of(), Set.of(), 2, null, null
         );
 
-        when(groupRepository.findByIdWithRoles(groupId)).thenReturn(Optional.of(group));
+        when(groupRepository.findByIdWithRolesAndUsers(groupId)).thenReturn(Optional.of(group));
         when(userRepository.findAllById(Set.of(1L, 2L))).thenReturn(List.of(user1, user2));
         when(userRepository.saveAll(anyList())).thenReturn(List.of(user1, user2));
         when(groupRepository.save(any(Group.class))).thenReturn(group);
@@ -177,7 +177,7 @@ class GroupServiceTest {
         Group group = Group.builder().id(groupId).name("Engineering").build();
         User user1 = User.builder().id(1L).username("user1").build();
 
-        when(groupRepository.findByIdWithRoles(groupId)).thenReturn(Optional.of(group));
+        when(groupRepository.findByIdWithRolesAndUsers(groupId)).thenReturn(Optional.of(group));
         when(userRepository.findAllById(Set.of(1L, 999L))).thenReturn(List.of(user1));
 
         // Act & Assert
@@ -190,7 +190,7 @@ class GroupServiceTest {
     void testGetGroupById_NotFound_ThrowsException() {
         // Arrange
         Long groupId = 999L;
-        when(groupRepository.findByIdWithRoles(groupId)).thenReturn(Optional.empty());
+        when(groupRepository.findByIdWithRolesAndUsers(groupId)).thenReturn(Optional.empty());
 
         // Act & Assert
         assertThatThrownBy(() -> groupService.getGroupById(groupId))
