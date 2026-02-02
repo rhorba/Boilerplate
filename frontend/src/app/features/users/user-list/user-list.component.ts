@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UserService } from '../../../services/user.service';
 import { AuthService, UserResponse } from '../../../core/services/auth.service';
-import { RoleResponse, PageResponse, UserSearchParams } from '../../../core/models/user.model';
+import { PageResponse, UserSearchParams } from '../../../core/models/user.model';
 import { UserEditPanelComponent } from '../user-edit-panel/user-edit-panel.component';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 
@@ -18,7 +18,6 @@ export class UserListComponent implements OnInit {
   authService = inject(AuthService);
 
   users = signal<PageResponse<UserResponse> | null>(null);
-  roles = signal<RoleResponse[]>([]);
   loading = signal(false);
   error = signal<string | null>(null);
   page = signal(0);
@@ -52,7 +51,6 @@ export class UserListComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadUsers();
-    this.loadRoles();
 
     this.searchSubject.pipe(debounceTime(300), distinctUntilChanged()).subscribe((term) => {
       this.searchTerm.set(term);
@@ -120,13 +118,6 @@ export class UserListComponent implements OnInit {
         this.loading.set(false);
         console.error(err);
       },
-    });
-  }
-
-  loadRoles(): void {
-    this.userService.getRoles().subscribe({
-      next: (roles) => this.roles.set(roles),
-      error: (err) => console.error('Failed to load roles', err),
     });
   }
 

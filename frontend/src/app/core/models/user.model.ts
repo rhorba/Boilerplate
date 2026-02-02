@@ -39,7 +39,6 @@ export interface CreateUserRequest {
   username: string;
   email: string;
   password: string;
-  roleIds?: number[];
 }
 
 export interface UpdateUserRequest {
@@ -47,7 +46,6 @@ export interface UpdateUserRequest {
   email?: string;
   password?: string;
   enabled?: boolean;
-  roleIds?: number[];
 }
 
 export interface BulkActionRequest {

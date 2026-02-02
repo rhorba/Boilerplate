@@ -26,17 +26,6 @@
       />
     </div>
 
-    <!-- Role Filter -->
-    <select
-      (change)="onRoleChange($any($event.target).value)"
-      class="px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-    >
-      <option value="">All Roles</option>
-      @for (role of roles(); track role.id) {
-        <option [value]="role.name">{{ role.name }}</option>
-      }
-    </select>
-
     <!-- Status Filter -->
     <select
       (change)="onStatusChange($any($event.target).value)"
@@ -314,7 +303,6 @@
 @if (panelOpen()) {
   <app-user-edit-panel
     [user]="editingUser()"
-    [roles]="roles()"
     (close)="closeEditPanel()"
     (saved)="onUserUpdated()"
   />

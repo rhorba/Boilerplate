@@ -14,7 +14,6 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { UserService } from '../../../services/user.service';
 import {
   UserResponse,
-  RoleResponse,
   UpdateUserRequest,
   CreateUserRequest,
 } from '../../../core/models/user.model';
@@ -27,7 +26,6 @@ import {
 })
 export class UserEditPanelComponent implements OnInit {
   @Input() user: UserResponse | null = null;
-  @Input() roles: RoleResponse[] = [];
   @Output() close = new EventEmitter<void>();
   @Output() saved = new EventEmitter<void>();
 
@@ -44,7 +42,6 @@ export class UserEditPanelComponent implements OnInit {
     email: ['', [Validators.required, Validators.email]],
     password: [''],
     enabled: [true],
-    roleIds: [[] as number[]],
   });
 
   ngOnInit(): void {
@@ -53,7 +50,6 @@ export class UserEditPanelComponent implements OnInit {
         username: this.user.username,
         email: this.user.email,
         enabled: this.user.enabled,
-        roleIds: this.user.roles.map((r) => r.id),
       });
     } else {
       const passwordCtrl = this.editForm.get('password')!;
@@ -65,20 +61,6 @@ export class UserEditPanelComponent implements OnInit {
   @HostListener('document:keydown.escape')
   onEscapeKey(): void {
     this.close.emit();
-  }
-
-  toggleRole(roleId: number): void {
-    const current = this.editForm.get('roleIds')!.value;
-    const index = current.indexOf(roleId);
-    if (index === -1) {
-      this.editForm.get('roleIds')!.setValue([...current, roleId]);
-    } else {
-      this.editForm.get('roleIds')!.setValue(current.filter((id: number) => id !== roleId));
-    }
-  }
-
-  isRoleSelected(roleId: number): boolean {
-    return this.editForm.get('roleIds')!.value.includes(roleId);
   }
 
   onSubmit(): void {
@@ -95,10 +77,6 @@ export class UserEditPanelComponent implements OnInit {
         email: formValue.email,
         password: formValue.password,
       };
-      const roleIds = formValue.roleIds;
-      if (roleIds.length > 0) {
-        request.roleIds = roleIds;
-      }
 
       this.userService.createUser(request).subscribe({
         next: () => {
@@ -117,12 +95,6 @@ export class UserEditPanelComponent implements OnInit {
       if (formValue.email !== this.user!.email) request.email = formValue.email;
       if (formValue.password) request.password = formValue.password;
       if (formValue.enabled !== this.user!.enabled) request.enabled = formValue.enabled;
-
-      const originalRoleIds = this.user!.roles.map((r) => r.id).sort();
-      const newRoleIds = formValue.roleIds.sort();
-      if (JSON.stringify(originalRoleIds) !== JSON.stringify(newRoleIds)) {
-        request.roleIds = formValue.roleIds;
-      }
 
       if (Object.keys(request).length === 0) {
         this.close.emit();
