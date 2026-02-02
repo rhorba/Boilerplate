@@ -7,8 +7,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Set;
-
 @Data
 @Builder
 @NoArgsConstructor
@@ -25,6 +23,4 @@ public class UpdateUserRequest {
     private String password;
 
     private Boolean enabled;
-
-    private Set<Long> roleIds;
 }

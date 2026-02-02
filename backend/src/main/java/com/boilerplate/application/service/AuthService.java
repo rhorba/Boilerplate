@@ -6,10 +6,8 @@ import com.boilerplate.application.dto.response.AuthResponse;
 import com.boilerplate.application.dto.response.UserResponse;
 import com.boilerplate.application.mapper.UserMapper;
 import com.boilerplate.domain.model.Group;
-import com.boilerplate.domain.model.Role;
 import com.boilerplate.domain.model.User;
 import com.boilerplate.domain.repository.GroupRepository;
-import com.boilerplate.domain.repository.RoleRepository;
 import com.boilerplate.domain.repository.UserRepository;
 import com.boilerplate.infrastructure.security.JwtService;
 import com.boilerplate.presentation.exception.DuplicateResourceException;
@@ -24,8 +22,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Set;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -34,7 +30,6 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final UserDetailsService userDetailsService;
     private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
     private final GroupRepository groupRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
@@ -117,9 +112,6 @@ public class AuthService {
             throw new DuplicateResourceException("Email already exists");
         }
 
-        Role userRole = roleRepository.findByName("USER")
-            .orElseThrow(() -> new RuntimeException("Default USER role not found"));
-
         User user = User.builder()
             .username(request.getUsername())
             .email(request.getEmail())
@@ -132,16 +124,11 @@ public class AuthService {
 
         User savedUser = userRepository.save(user);
 
-        // Create personal group for the new user
-        Group personalGroup = Group.builder()
-            .name("personal_" + savedUser.getUsername())
-            .description("Personal group for " + savedUser.getUsername())
-            .roles(Set.of(userRole))
-            .build();
-        Group savedGroup = groupRepository.save(personalGroup);
+        // Assign user to Default Users group
+        Group defaultGroup = groupRepository.findByName("Default Users")
+            .orElseThrow(() -> new RuntimeException("Default Users group not found"));
 
-        // Assign user to their personal group
-        savedUser.getGroups().add(savedGroup);
+        savedUser.getGroups().add(defaultGroup);
         userRepository.save(savedUser);
 
         Authentication authentication = authenticationManager.authenticate(

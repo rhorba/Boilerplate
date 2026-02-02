@@ -6,10 +6,8 @@ import com.boilerplate.application.dto.request.UserSearchRequest;
 import com.boilerplate.application.dto.response.UserResponse;
 import com.boilerplate.application.mapper.UserMapper;
 import com.boilerplate.domain.model.Group;
-import com.boilerplate.domain.model.Role;
 import com.boilerplate.domain.model.User;
 import com.boilerplate.domain.repository.GroupRepository;
-import com.boilerplate.domain.repository.RoleRepository;
 import com.boilerplate.domain.repository.UserRepository;
 import com.boilerplate.domain.repository.UserSpecification;
 import com.boilerplate.presentation.exception.DuplicateResourceException;
@@ -25,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +30,6 @@ import java.util.Set;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
     private final GroupRepository groupRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
@@ -107,25 +103,11 @@ public class UserService {
 
         User savedUser = userRepository.save(user);
 
-        // Create personal group for the new user with requested roles
-        Set<Role> roles;
-        if (request.getRoleIds() != null && !request.getRoleIds().isEmpty()) {
-            roles = roleRepository.findAllByIdWithPermissions(request.getRoleIds());
-        } else {
-            Role userRole = roleRepository.findByName("USER")
-                .orElseThrow(() -> new RuntimeException("Default USER role not found"));
-            roles = Set.of(userRole);
-        }
+        // Assign user to Default Users group
+        Group defaultGroup = groupRepository.findByName("Default Users")
+            .orElseThrow(() -> new RuntimeException("Default Users group not found"));
 
-        Group personalGroup = Group.builder()
-            .name("personal_" + savedUser.getUsername())
-            .description("Personal group for " + savedUser.getUsername())
-            .roles(roles)
-            .build();
-        Group savedGroup = groupRepository.save(personalGroup);
-
-        // Assign user to their personal group
-        savedUser.getGroups().add(savedGroup);
+        savedUser.getGroups().add(defaultGroup);
         savedUser = userRepository.save(savedUser);
         log.info("User created successfully: {}", savedUser.getUsername());
 
@@ -163,21 +145,6 @@ public class UserService {
 
         if (request.getPassword() != null && !request.getPassword().isBlank()) {
             user.setPassword(passwordEncoder.encode(request.getPassword()));
-        }
-
-        // Update roles in user's personal group if provided
-        if (request.getRoleIds() != null) {
-            Set<Role> roles = roleRepository.findAllByIdWithPermissions(request.getRoleIds());
-            // Find user's personal group and update its roles
-            Group personalGroup = user.getGroups().stream()
-                .filter(g -> g.getName().equals("personal_" + user.getUsername()))
-                .findFirst()
-                .orElse(null);
-
-            if (personalGroup != null) {
-                personalGroup.setRoles(roles);
-                groupRepository.save(personalGroup);
-            }
         }
 
         User updatedUser = userRepository.save(user);
