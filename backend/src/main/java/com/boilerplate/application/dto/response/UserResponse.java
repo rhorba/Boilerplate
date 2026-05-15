@@ -17,6 +17,7 @@ public class UserResponse {
     private String username;
     private String email;
     private Boolean enabled;
+    private Set<String> effectivePermissions;
     private Set<GroupResponse> groups;
     private LocalDateTime deletedAt;
     private LocalDateTime createdAt;

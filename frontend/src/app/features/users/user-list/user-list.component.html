@@ -2,7 +2,7 @@
   <!-- Header -->
   <div class="flex justify-between items-center mb-6">
     <h1 class="text-3xl font-bold dark:text-white">Users</h1>
-    @if (authService.hasPermission('USER_CREATE')) {
+    @if (authService.hasPermission('USER:CREATE')) {
       <button
         (click)="openCreatePanel()"
         class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
@@ -37,7 +37,7 @@
     </select>
 
     <!-- Show Deleted Toggle -->
-    @if (authService.hasPermission('USER_MANAGE')) {
+    @if (authService.hasPermission('USER:MANAGE')) {
       <label
         class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer"
       >
@@ -62,7 +62,7 @@
       >
       <div class="flex gap-2 ml-auto">
         @if (!showDeleted()) {
-          @if (authService.hasPermission('USER_UPDATE')) {
+          @if (authService.hasPermission('USER:UPDATE')) {
             <button
               (click)="bulkEnable()"
               class="px-3 py-1 text-sm bg-green-600 text-white rounded hover:bg-green-700"
@@ -76,7 +76,7 @@
               Disable
             </button>
           }
-          @if (authService.hasPermission('USER_DELETE')) {
+          @if (authService.hasPermission('USER:DELETE')) {
             <button
               (click)="bulkDelete()"
               class="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700"
@@ -149,7 +149,7 @@
             <th
               class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase"
             >
-              Roles
+              Groups
             </th>
             <th
               class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase"
@@ -195,11 +195,11 @@
                 {{ user.email }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm">
-                @for (role of user.roles; track role.id) {
+                @for (group of user.groups; track group.id) {
                   <span
                     class="inline-flex items-center px-2 py-1 mr-1 text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded"
                   >
-                    {{ role.name }}
+                    {{ group.name }}
                   </span>
                 }
               </td>
@@ -214,7 +214,7 @@
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm">
                 @if (user.deletedAt) {
-                  @if (authService.hasPermission('USER_MANAGE')) {
+                  @if (authService.hasPermission('USER:MANAGE')) {
                     <button
                       (click)="restoreUser(user.id)"
                       class="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300 mr-3"
@@ -223,8 +223,8 @@
                     </button>
                   }
                   @if (
-                    authService.hasPermission('USER_DELETE') &&
-                    authService.hasPermission('SYSTEM_MANAGE')
+                    authService.hasPermission('USER:DELETE') &&
+                    authService.hasPermission('SYSTEM:MANAGE')
                   ) {
                     <button
                       (click)="purgeUser(user)"
@@ -234,7 +234,7 @@
                     </button>
                   }
                 } @else {
-                  @if (authService.hasPermission('USER_UPDATE')) {
+                  @if (authService.hasPermission('USER:UPDATE')) {
                     <button
                       (click)="openEditPanel(user)"
                       class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 mr-3"
@@ -242,7 +242,7 @@
                       Edit
                     </button>
                   }
-                  @if (authService.hasPermission('USER_DELETE')) {
+                  @if (authService.hasPermission('USER:DELETE')) {
                     <button
                       (click)="deleteUser(user.id)"
                       class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"

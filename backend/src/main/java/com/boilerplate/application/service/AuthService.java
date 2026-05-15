@@ -9,6 +9,7 @@ import com.boilerplate.domain.model.Group;
 import com.boilerplate.domain.model.User;
 import com.boilerplate.domain.repository.GroupRepository;
 import com.boilerplate.domain.repository.UserRepository;
+import com.boilerplate.infrastructure.security.AbacPolicyEvaluator;
 import com.boilerplate.infrastructure.security.JwtService;
 import com.boilerplate.presentation.exception.DuplicateResourceException;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +36,7 @@ public class AuthService {
     private final JwtService jwtService;
     private final UserMapper userMapper;
     private final AuditPublisher auditPublisher;
+    private final AbacPolicyEvaluator abacPolicyEvaluator;
 
     @Transactional(readOnly = true)
     public AuthResponse login(LoginRequest request) {
@@ -55,6 +57,9 @@ public class AuthService {
         UserResponse userResponse = userRepository.findByUsernameWithGroups(request.getUsername())
             .map(userMapper::toResponse)
             .orElseThrow(() -> new RuntimeException("User not found after authentication"));
+        userResponse.setEffectivePermissions(
+            abacPolicyEvaluator.computeEffectivePermissions(userResponse.getId())
+        );
 
         log.info("User logged in successfully: {}", request.getUsername());
 
@@ -90,6 +95,9 @@ public class AuthService {
         UserResponse userResponse = userRepository.findByUsernameWithGroups(username)
             .map(userMapper::toResponse)
             .orElseThrow(() -> new RuntimeException("User not found"));
+        userResponse.setEffectivePermissions(
+            abacPolicyEvaluator.computeEffectivePermissions(userResponse.getId())
+        );
 
         return AuthResponse.builder()
             .accessToken(newAccessToken)
@@ -143,6 +151,9 @@ public class AuthService {
         UserResponse userResponse = userRepository.findByUsernameWithGroups(request.getUsername())
             .map(userMapper::toResponse)
             .orElseThrow(() -> new RuntimeException("User not found after registration"));
+        userResponse.setEffectivePermissions(
+            abacPolicyEvaluator.computeEffectivePermissions(userResponse.getId())
+        );
 
         log.info("User registered successfully: {}", request.getUsername());
 

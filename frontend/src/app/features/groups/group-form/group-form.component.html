@@ -31,7 +31,7 @@
       </p>
     </div>
 
-    <div class="mb-4">
+    <div class="mb-6">
       <label class="block text-gray-700 text-sm font-bold mb-2" for="description">
         Description
       </label>
@@ -50,25 +50,6 @@
       >
         Description must not exceed 255 characters.
       </p>
-    </div>
-
-    <div class="mb-6">
-      <label class="block text-gray-700 text-sm font-bold mb-2"> Roles </label>
-      <div class="space-y-2">
-        <div *ngFor="let role of roles" class="flex items-center">
-          <input
-            type="checkbox"
-            [id]="'role-' + role.id"
-            [checked]="isRoleSelected(role.id)"
-            (change)="toggleRole(role.id)"
-            class="mr-2"
-          />
-          <label [for]="'role-' + role.id" class="text-gray-700 cursor-pointer">
-            {{ role.name }}
-            <span class="text-gray-500 text-sm">{{ role.description }}</span>
-          </label>
-        </div>
-      </div>
     </div>
 
     <div class="flex items-center justify-end space-x-4">

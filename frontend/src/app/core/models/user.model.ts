@@ -5,26 +5,11 @@ export interface UserResponse {
   username: string;
   email: string;
   enabled: boolean;
-  roles: RoleResponse[]; // Keep for backward compatibility - computed from groups
-  groups: GroupResponse[]; // New field - primary source
+  effectivePermissions: string[];
+  groups: GroupResponse[];
   deletedAt: string | null;
   createdAt: string;
   updatedAt: string;
-}
-
-export interface RoleResponse {
-  id: number;
-  name: string;
-  description: string;
-  permissions: PermissionResponse[];
-}
-
-export interface PermissionResponse {
-  id: number;
-  name: string;
-  description: string;
-  resource: string;
-  action: string;
 }
 
 export interface PageResponse<T> {
@@ -64,7 +49,7 @@ export interface BulkActionResponse {
 
 export interface UserSearchParams {
   search?: string;
-  role?: string;
+  group?: string;
   enabled?: boolean;
   showDeleted?: boolean;
   page?: number;

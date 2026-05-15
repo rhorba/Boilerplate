@@ -104,7 +104,7 @@ export class UserListComponent implements OnInit {
     };
 
     if (this.searchTerm()) params.search = this.searchTerm();
-    if (this.selectedRole()) params.role = this.selectedRole();
+    if (this.selectedRole()) params.group = this.selectedRole();
     if (this.selectedStatus() !== '') params.enabled = this.selectedStatus() === 'true';
     if (this.showDeleted()) params.showDeleted = true;
 

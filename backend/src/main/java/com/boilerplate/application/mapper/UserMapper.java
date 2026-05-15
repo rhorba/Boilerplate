@@ -41,5 +41,6 @@ public interface UserMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateEntity(@MappingTarget User user, UpdateUserRequest request);
 
+    @Mapping(target = "effectivePermissions", ignore = true)
     UserResponse toResponse(User user);
 }

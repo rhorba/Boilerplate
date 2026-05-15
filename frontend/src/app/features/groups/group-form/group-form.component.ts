@@ -3,9 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GroupService } from '../../../core/services/group.service';
-import { UserService } from '../../../services/user.service';
 import { GroupRequest } from '../../../core/models/group.model';
-import { RoleResponse } from '../../../core/models/user.model';
 
 @Component({
   selector: 'app-group-form',
@@ -17,12 +15,10 @@ import { RoleResponse } from '../../../core/models/user.model';
 export class GroupFormComponent implements OnInit {
   private fb = inject(FormBuilder);
   private groupService = inject(GroupService);
-  private userService = inject(UserService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 
   groupForm: FormGroup;
-  roles: RoleResponse[] = [];
   isEditMode = false;
   groupId: number | null = null;
   loading = false;
@@ -32,13 +28,10 @@ export class GroupFormComponent implements OnInit {
     this.groupForm = this.fb.group({
       name: ['', [Validators.required, Validators.maxLength(100)]],
       description: ['', Validators.maxLength(255)],
-      roleIds: [[]],
     });
   }
 
   ngOnInit(): void {
-    this.loadRoles();
-
     this.route.params.subscribe((params) => {
       if (params['id']) {
         this.isEditMode = true;
@@ -48,24 +41,12 @@ export class GroupFormComponent implements OnInit {
     });
   }
 
-  loadRoles(): void {
-    this.userService.getRoles().subscribe({
-      next: (data) => {
-        this.roles = data;
-      },
-      error: (err) => {
-        console.error('Failed to load roles', err);
-      },
-    });
-  }
-
   loadGroup(id: number): void {
     this.groupService.getGroupById(id).subscribe({
       next: (group) => {
         this.groupForm.patchValue({
           name: group.name,
           description: group.description,
-          roleIds: group.roles.map((r) => r.id),
         });
       },
       error: (err) => {
@@ -73,24 +54,6 @@ export class GroupFormComponent implements OnInit {
         console.error(err);
       },
     });
-  }
-
-  toggleRole(roleId: number): void {
-    const roleIds = this.groupForm.get('roleIds')?.value || [];
-    const index = roleIds.indexOf(roleId);
-
-    if (index > -1) {
-      roleIds.splice(index, 1);
-    } else {
-      roleIds.push(roleId);
-    }
-
-    this.groupForm.patchValue({ roleIds });
-  }
-
-  isRoleSelected(roleId: number): boolean {
-    const roleIds = this.groupForm.get('roleIds')?.value || [];
-    return roleIds.includes(roleId);
   }
 
   onSubmit(): void {

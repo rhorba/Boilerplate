@@ -4,7 +4,6 @@ import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import {
   UserResponse,
-  RoleResponse,
   PageResponse,
   CreateUserRequest,
   UpdateUserRequest,
@@ -25,7 +24,7 @@ export class UserService {
       .set('size', (params.size ?? 10).toString());
 
     if (params.search) httpParams = httpParams.set('search', params.search);
-    if (params.role) httpParams = httpParams.set('role', params.role);
+    if (params.group) httpParams = httpParams.set('group', params.group);
     if (params.enabled !== undefined)
       httpParams = httpParams.set('enabled', params.enabled.toString());
     if (params.showDeleted) httpParams = httpParams.set('showDeleted', 'true');
@@ -64,9 +63,5 @@ export class UserService {
 
   bulkUpdateStatus(request: BulkStatusRequest): Observable<BulkActionResponse> {
     return this.http.post<BulkActionResponse>(`${this.apiUrl}/bulk/status`, request);
-  }
-
-  getRoles(): Observable<RoleResponse[]> {
-    return this.http.get<RoleResponse[]>(`${environment.apiUrl}/roles`);
   }
 }

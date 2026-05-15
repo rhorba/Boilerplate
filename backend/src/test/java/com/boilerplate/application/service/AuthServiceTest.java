@@ -8,6 +8,7 @@ import com.boilerplate.domain.model.Group;
 import com.boilerplate.domain.model.User;
 import com.boilerplate.domain.repository.GroupRepository;
 import com.boilerplate.domain.repository.UserRepository;
+import com.boilerplate.infrastructure.security.AbacPolicyEvaluator;
 import com.boilerplate.infrastructure.security.JwtService;
 import com.boilerplate.presentation.exception.DuplicateResourceException;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,6 +25,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -55,6 +57,9 @@ class AuthServiceTest {
 
     @Mock
     private AuditPublisher auditPublisher;
+
+    @Mock
+    private AbacPolicyEvaluator abacPolicyEvaluator;
 
     @InjectMocks
     private AuthService authService;
@@ -112,6 +117,7 @@ class AuthServiceTest {
         when(jwtService.generateRefreshToken(userDetails, false)).thenReturn("refresh-token");
         when(userRepository.findByUsernameWithGroups("newuser")).thenReturn(Optional.of(savedUser));
         when(userMapper.toResponse(savedUser)).thenReturn(userResponse);
+        when(abacPolicyEvaluator.computeEffectivePermissions(2L)).thenReturn(Set.of());
 
         AuthResponse result = authService.register(registerRequest);
 

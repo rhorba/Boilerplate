@@ -17,9 +17,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -120,6 +122,37 @@ public class AbacPolicyEvaluator {
             case STARTS_WITH -> actual.toLowerCase(Locale.ROOT).startsWith(
                 expected.toLowerCase(Locale.ROOT));
         };
+    }
+
+    @Transactional(readOnly = true)
+    public Set<String> computeEffectivePermissions(Long userId) {
+        Map<String, String> userAttrs = loadUserAttributes(userId);
+        groupRepository.findGroupNamesByUserId(userId)
+            .forEach(name -> userAttrs.putIfAbsent("group:" + name.toLowerCase(Locale.ROOT), "true"));
+
+        Set<String> effective = new HashSet<>();
+        for (PolicyResource resource : PolicyResource.values()) {
+            for (PolicyAction action : PolicyAction.values()) {
+                if (isPermitted(resource, action, userAttrs)) {
+                    effective.add(resource.name() + ":" + action.name());
+                }
+            }
+        }
+        return effective;
+    }
+
+    private boolean isPermitted(PolicyResource resource, PolicyAction action,
+        Map<String, String> userAttrs) {
+        List<Policy> candidates = policyRepository.findEnabledByResourceAndAction(resource, action);
+        boolean denied = candidates.stream()
+            .filter(p -> p.getEffect() == PolicyEffect.DENY)
+            .anyMatch(p -> allConditionsMatch(p, userAttrs));
+        if (denied) {
+            return false;
+        }
+        return candidates.stream()
+            .filter(p -> p.getEffect() == PolicyEffect.PERMIT)
+            .anyMatch(p -> allConditionsMatch(p, userAttrs));
     }
 
     private Map<String, String> loadUserAttributes(Long userId) {

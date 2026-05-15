@@ -80,19 +80,12 @@ export class AuthService {
       );
   }
 
+  /** Check if the current user has a given permission. Format: 'RESOURCE:ACTION' (e.g. 'USER:READ'). */
   hasPermission(permission: string): boolean {
     const user = this.currentUser();
-    if (!user || !user.roles) return false;
-    return user.roles.some(
-      (role) => role.permissions && role.permissions.some((p) => p.name === permission)
-    );
-  }
-
-  hasRole(roleName: string): boolean {
-    const user = this.currentUser();
-    if (!user || !user.roles) return false;
-    return user.roles.some((role) => role.name === roleName);
+    if (!user || !user.effectivePermissions) return false;
+    return user.effectivePermissions.includes(permission);
   }
 }
 
-export { UserResponse, RoleResponse, PermissionResponse } from '../models/user.model';
+export { UserResponse } from '../models/user.model';
