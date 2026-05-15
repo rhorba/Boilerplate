@@ -219,6 +219,7 @@
                 <configuration>
                     <effort>Max</effort>
                     <threshold>Low</threshold>
+                    <excludeFilterFile>${project.basedir}/spotbugs-exclude.xml</excludeFilterFile>
                 </configuration>
                 <executions>
                     <execution>
@@ -235,6 +236,16 @@
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>${jacoco.version}</version>
+                <configuration>
+                    <!-- Exclude generated and trivial code from coverage analysis -->
+                    <excludes>
+                        <exclude>com/boilerplate/BoilerplateApplication.class</exclude>
+                        <exclude>com/boilerplate/application/dto/**/*.class</exclude>
+                        <exclude>com/boilerplate/domain/model/**/*.class</exclude>
+                        <exclude>com/boilerplate/domain/repository/**/*.class</exclude>
+                        <exclude>com/boilerplate/application/mapper/**/*MapperImpl.class</exclude>
+                    </excludes>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>

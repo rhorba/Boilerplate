@@ -25,7 +25,7 @@ public class AuditLogController {
     private final AuditLogService auditLogService;
 
     @GetMapping
-    @PreAuthorize("hasAnyAuthority('SYSTEM_MANAGE', 'USER_READ')")
+    @PreAuthorize("@abacEvaluator.hasPermission(authentication, 'AUDIT_LOG', 'READ')")
     @Operation(summary = "Get all audit logs")
     public Page<AuditLogResponse> getAllAuditLogs(
         @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable

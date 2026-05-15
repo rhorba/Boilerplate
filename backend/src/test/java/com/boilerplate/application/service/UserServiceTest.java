@@ -5,10 +5,8 @@ import com.boilerplate.application.dto.request.UserSearchRequest;
 import com.boilerplate.application.dto.response.UserResponse;
 import com.boilerplate.application.mapper.UserMapper;
 import com.boilerplate.domain.model.Group;
-import com.boilerplate.domain.model.Role;
 import com.boilerplate.domain.model.User;
 import com.boilerplate.domain.repository.GroupRepository;
-import com.boilerplate.domain.repository.RoleRepository;
 import com.boilerplate.domain.repository.UserRepository;
 import com.boilerplate.presentation.exception.DuplicateResourceException;
 import com.boilerplate.presentation.exception.ResourceNotFoundException;
@@ -37,9 +35,6 @@ class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;
-
-    @Mock
-    private RoleRepository roleRepository;
 
     @Mock
     private GroupRepository groupRepository;
@@ -93,7 +88,6 @@ class UserServiceTest {
 
     @Test
     void createUser_Success() {
-        // Arrange
         when(userRepository.existsByUsernameAndDeletedAtIsNull(anyString())).thenReturn(false);
         when(userRepository.existsByEmailAndDeletedAtIsNull(anyString())).thenReturn(false);
         when(userMapper.toEntity(any())).thenReturn(testUser);
@@ -102,10 +96,8 @@ class UserServiceTest {
         when(userRepository.save(any(User.class))).thenReturn(testUser);
         when(userMapper.toResponse(any())).thenReturn(testUserResponse);
 
-        // Act
         UserResponse result = userService.createUser(createRequest);
 
-        // Assert
         assertThat(result).isNotNull();
         assertThat(result.getUsername()).isEqualTo("testuser");
         verify(groupRepository).findByName("Default Users");
@@ -114,10 +106,8 @@ class UserServiceTest {
 
     @Test
     void createUser_DuplicateUsername_ThrowsException() {
-        // Arrange
         when(userRepository.existsByUsernameAndDeletedAtIsNull(anyString())).thenReturn(true);
 
-        // Act & Assert
         assertThatThrownBy(() -> userService.createUser(createRequest))
             .isInstanceOf(DuplicateResourceException.class)
             .hasMessageContaining("Username already exists");
@@ -127,24 +117,19 @@ class UserServiceTest {
 
     @Test
     void getUserById_Success() {
-        // Arrange
         when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
         when(userMapper.toResponse(testUser)).thenReturn(testUserResponse);
 
-        // Act
         UserResponse result = userService.getUserById(1L);
 
-        // Assert
         assertThat(result).isNotNull();
         assertThat(result.getId()).isEqualTo(1L);
     }
 
     @Test
     void getUserById_NotFound_ThrowsException() {
-        // Arrange
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
-        // Act & Assert
         assertThatThrownBy(() -> userService.getUserById(1L))
             .isInstanceOf(ResourceNotFoundException.class)
             .hasMessageContaining("User not found");
@@ -152,22 +137,17 @@ class UserServiceTest {
 
     @Test
     void deleteUser_Success() {
-        // Arrange
         when(userRepository.softDeleteById(eq(1L), any(LocalDateTime.class))).thenReturn(1);
 
-        // Act
         userService.deleteUser(1L);
 
-        // Assert
         verify(userRepository).softDeleteById(eq(1L), any(LocalDateTime.class));
     }
 
     @Test
     void deleteUser_NotFound_ThrowsException() {
-        // Arrange
         when(userRepository.softDeleteById(eq(1L), any(LocalDateTime.class))).thenReturn(0);
 
-        // Act & Assert
         assertThatThrownBy(() -> userService.deleteUser(1L))
             .isInstanceOf(ResourceNotFoundException.class)
             .hasMessageContaining("User not found");
@@ -175,48 +155,38 @@ class UserServiceTest {
 
     @Test
     void restoreUser_Success() {
-        // Arrange
         when(userRepository.restoreById(1L)).thenReturn(1);
         when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
         when(userMapper.toResponse(testUser)).thenReturn(testUserResponse);
 
-        // Act
         UserResponse result = userService.restoreUser(1L);
 
-        // Assert
         assertThat(result).isNotNull();
         verify(userRepository).restoreById(1L);
     }
 
     @Test
     void restoreUser_NotFound_ThrowsException() {
-        // Arrange
         when(userRepository.restoreById(1L)).thenReturn(0);
 
-        // Act & Assert
         assertThatThrownBy(() -> userService.restoreUser(1L))
             .isInstanceOf(ResourceNotFoundException.class);
     }
 
     @Test
     void purgeUser_OnlyDeletesSoftDeletedUsers() {
-        // Arrange
         testUser.setDeletedAt(LocalDateTime.now());
         when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
 
-        // Act
         userService.purgeUser(1L);
 
-        // Assert
         verify(userRepository).delete(testUser);
     }
 
     @Test
     void purgeUser_ActiveUser_ThrowsException() {
-        // Arrange - user has deletedAt = null
         when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
 
-        // Act & Assert
         assertThatThrownBy(() -> userService.purgeUser(1L))
             .isInstanceOf(ResourceNotFoundException.class);
     }
@@ -224,16 +194,13 @@ class UserServiceTest {
     @SuppressWarnings("unchecked")
     @Test
     void searchUsers_NoFilters_ReturnsAllActive() {
-        // Arrange
         UserSearchRequest searchRequest = UserSearchRequest.builder().build();
         Page<User> page = new PageImpl<>(List.of(testUser));
         when(userRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(page);
         when(userMapper.toResponse(testUser)).thenReturn(testUserResponse);
 
-        // Act
         Page<UserResponse> result = userService.searchUsers(searchRequest, Pageable.unpaged());
 
-        // Assert
         assertThat(result.getContent()).hasSize(1);
     }
 }

@@ -3,7 +3,6 @@ package com.boilerplate.presentation.exception;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
@@ -97,20 +96,6 @@ public class GlobalExceptionHandler {
     ) {
         log.error("Authentication error: {}", ex.getMessage());
         return buildErrorResponse(HttpStatus.UNAUTHORIZED, ex.getMessage(), request.getRequestURI());
-    }
-
-    @ExceptionHandler(AccessDeniedException.class)
-    @ResponseStatus(HttpStatus.FORBIDDEN)
-    public ErrorResponse handleAccessDeniedException(
-        AccessDeniedException ex,
-        HttpServletRequest request
-    ) {
-        log.error("Access denied: {}", ex.getMessage());
-        return buildErrorResponse(
-            HttpStatus.FORBIDDEN,
-            "You don't have permission to access this resource",
-            request.getRequestURI()
-        );
     }
 
     @ExceptionHandler(RateLimitExceededException.class)

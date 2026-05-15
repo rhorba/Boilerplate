@@ -32,18 +32,18 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
-    @PreAuthorize("hasAuthority('USER_READ')")
+    @PreAuthorize("@abacEvaluator.hasPermission(authentication, 'USER', 'READ')")
     @Operation(summary = "Search users", description = "Search and filter users with pagination")
     public ResponseEntity<Page<UserResponse>> getAllUsers(
         @RequestParam(required = false) String search,
-        @RequestParam(required = false) String role,
+        @RequestParam(required = false) String group,
         @RequestParam(required = false) Boolean enabled,
         @RequestParam(required = false, defaultValue = "false") Boolean showDeleted,
         Pageable pageable
     ) {
         UserSearchRequest searchRequest = UserSearchRequest.builder()
             .search(search)
-            .role(role)
+            .group(group)
             .enabled(enabled)
             .showDeleted(showDeleted)
             .build();
@@ -51,28 +51,28 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('USER_READ')")
+    @PreAuthorize("@abacEvaluator.hasPermission(authentication, 'USER', 'READ', #id)")
     @Operation(summary = "Get user by ID", description = "Retrieve user details by ID")
     public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.getUserById(id));
     }
 
     @GetMapping("/username/{username}")
-    @PreAuthorize("hasAuthority('USER_READ')")
+    @PreAuthorize("@abacEvaluator.hasPermission(authentication, 'USER', 'READ')")
     @Operation(summary = "Get user by username", description = "Retrieve user details by username")
     public ResponseEntity<UserResponse> getUserByUsername(@PathVariable String username) {
         return ResponseEntity.ok(userService.getUserByUsername(username));
     }
 
     @PostMapping
-    @PreAuthorize("hasAuthority('USER_CREATE')")
+    @PreAuthorize("@abacEvaluator.hasPermission(authentication, 'USER', 'CREATE')")
     @Operation(summary = "Create user", description = "Create a new user")
     public ResponseEntity<UserResponse> createUser(@Valid @RequestBody CreateUserRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(request));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('USER_UPDATE')")
+    @PreAuthorize("@abacEvaluator.hasPermission(authentication, 'USER', 'UPDATE', #id)")
     @Operation(summary = "Update user", description = "Update existing user")
     public ResponseEntity<UserResponse> updateUser(
         @PathVariable Long id,
@@ -82,7 +82,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('USER_DELETE')")
+    @PreAuthorize("@abacEvaluator.hasPermission(authentication, 'USER', 'DELETE', #id)")
     @Operation(summary = "Delete user", description = "Delete user by ID")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
@@ -90,14 +90,14 @@ public class UserController {
     }
 
     @PostMapping("/{id}/restore")
-    @PreAuthorize("hasAuthority('USER_MANAGE')")
+    @PreAuthorize("@abacEvaluator.hasPermission(authentication, 'USER', 'MANAGE', #id)")
     @Operation(summary = "Restore user", description = "Restore a soft-deleted user")
     public ResponseEntity<UserResponse> restoreUser(@PathVariable Long id) {
         return ResponseEntity.ok(userService.restoreUser(id));
     }
 
     @DeleteMapping("/{id}/purge")
-    @PreAuthorize("hasAuthority('USER_DELETE') and hasAuthority('SYSTEM_MANAGE')")
+    @PreAuthorize("@abacEvaluator.hasPermission(authentication, 'SYSTEM', 'MANAGE')")
     @Operation(summary = "Purge user", description = "Permanently delete a soft-deleted user")
     public ResponseEntity<Void> purgeUser(@PathVariable Long id) {
         userService.purgeUser(id);
@@ -105,7 +105,7 @@ public class UserController {
     }
 
     @PostMapping("/bulk/delete")
-    @PreAuthorize("hasAuthority('USER_DELETE')")
+    @PreAuthorize("@abacEvaluator.hasPermission(authentication, 'USER', 'DELETE')")
     @Operation(summary = "Bulk delete users", description = "Soft-delete multiple users")
     public ResponseEntity<BulkActionResponse> bulkDelete(@Valid @RequestBody BulkActionRequest request) {
         int affected = userService.bulkSoftDelete(request.getUserIds());
@@ -116,7 +116,7 @@ public class UserController {
     }
 
     @PostMapping("/bulk/status")
-    @PreAuthorize("hasAuthority('USER_UPDATE')")
+    @PreAuthorize("@abacEvaluator.hasPermission(authentication, 'USER', 'UPDATE')")
     @Operation(summary = "Bulk update status", description = "Enable or disable multiple users")
     public ResponseEntity<BulkActionResponse> bulkUpdateStatus(@Valid @RequestBody BulkStatusRequest request) {
         int affected = userService.bulkUpdateStatus(request.getUserIds(), request.getEnabled());

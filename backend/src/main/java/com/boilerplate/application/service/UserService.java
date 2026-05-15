@@ -57,9 +57,9 @@ public class UserService {
             spec = spec.and(keywordSpec);
         }
 
-        Specification<User> roleSpec = UserSpecification.hasRole(searchRequest.getRole());
-        if (roleSpec != null) {
-            spec = spec.and(roleSpec);
+        Specification<User> groupSpec = UserSpecification.hasGroup(searchRequest.getGroup());
+        if (groupSpec != null) {
+            spec = spec.and(groupSpec);
         }
 
         Specification<User> enabledSpec = UserSpecification.hasEnabled(searchRequest.getEnabled());
@@ -224,20 +224,6 @@ public class UserService {
     @Transactional
     public int bulkSoftDelete(List<Long> ids) {
         log.debug("Bulk soft-deleting users: {}", ids);
-
-        long adminCount = userRepository.countByDeletedAtIsNullAndGroupsRolesName("ADMIN");
-        long adminsInBatch = ids.stream()
-            .map(userRepository::findById)
-            .flatMap(java.util.Optional::stream)
-            .filter(u -> u.getDeletedAt() == null)
-            .filter(u -> u.getGroups().stream()
-                .flatMap(g -> g.getRoles().stream())
-                .anyMatch(r -> "ADMIN".equals(r.getName())))
-            .count();
-
-        if (adminCount > 0 && adminCount <= adminsInBatch) {
-            throw new IllegalStateException("Cannot delete the last admin user");
-        }
 
         int deleted = userRepository.softDeleteByIds(ids, LocalDateTime.now());
         log.info("Bulk soft-deleted {} users", deleted);

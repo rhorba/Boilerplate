@@ -5,10 +5,8 @@ import com.boilerplate.application.dto.response.AuthResponse;
 import com.boilerplate.application.dto.response.UserResponse;
 import com.boilerplate.application.mapper.UserMapper;
 import com.boilerplate.domain.model.Group;
-import com.boilerplate.domain.model.Role;
 import com.boilerplate.domain.model.User;
 import com.boilerplate.domain.repository.GroupRepository;
-import com.boilerplate.domain.repository.RoleRepository;
 import com.boilerplate.domain.repository.UserRepository;
 import com.boilerplate.infrastructure.security.JwtService;
 import com.boilerplate.presentation.exception.DuplicateResourceException;
@@ -44,9 +42,6 @@ class AuthServiceTest {
     private UserRepository userRepository;
 
     @Mock
-    private RoleRepository roleRepository;
-
-    @Mock
     private GroupRepository groupRepository;
 
     @Mock
@@ -67,7 +62,6 @@ class AuthServiceTest {
     private RegisterRequest registerRequest;
     private User savedUser;
     private UserResponse userResponse;
-    private Role userRole;
     private Group defaultGroup;
 
     @BeforeEach
@@ -77,10 +71,6 @@ class AuthServiceTest {
             .email("new@example.com")
             .password("password123")
             .build();
-
-        userRole = new Role();
-        userRole.setId(2L);
-        userRole.setName("USER");
 
         defaultGroup = Group.builder()
             .id(1L)
@@ -106,7 +96,6 @@ class AuthServiceTest {
 
     @Test
     void register_Success() {
-        // Arrange
         when(userRepository.existsByUsernameAndDeletedAtIsNull("newuser")).thenReturn(false);
         when(userRepository.existsByEmailAndDeletedAtIsNull("new@example.com")).thenReturn(false);
         when(groupRepository.findByName("Default Users")).thenReturn(Optional.of(defaultGroup));
@@ -121,14 +110,11 @@ class AuthServiceTest {
 
         when(jwtService.generateAccessToken(userDetails)).thenReturn("access-token");
         when(jwtService.generateRefreshToken(userDetails, false)).thenReturn("refresh-token");
-        when(userRepository.findByUsernameWithRolesAndPermissions("newuser"))
-            .thenReturn(Optional.of(savedUser));
+        when(userRepository.findByUsernameWithGroups("newuser")).thenReturn(Optional.of(savedUser));
         when(userMapper.toResponse(savedUser)).thenReturn(userResponse);
 
-        // Act
         AuthResponse result = authService.register(registerRequest);
 
-        // Assert
         assertThat(result).isNotNull();
         assertThat(result.getAccessToken()).isEqualTo("access-token");
         assertThat(result.getRefreshToken()).isEqualTo("refresh-token");
@@ -141,10 +127,8 @@ class AuthServiceTest {
 
     @Test
     void register_DuplicateUsername_ThrowsException() {
-        // Arrange
         when(userRepository.existsByUsernameAndDeletedAtIsNull("newuser")).thenReturn(true);
 
-        // Act & Assert
         assertThatThrownBy(() -> authService.register(registerRequest))
             .isInstanceOf(DuplicateResourceException.class)
             .hasMessageContaining("Username already exists");
@@ -154,11 +138,9 @@ class AuthServiceTest {
 
     @Test
     void register_DuplicateEmail_ThrowsException() {
-        // Arrange
         when(userRepository.existsByUsernameAndDeletedAtIsNull("newuser")).thenReturn(false);
         when(userRepository.existsByEmailAndDeletedAtIsNull("new@example.com")).thenReturn(true);
 
-        // Act & Assert
         assertThatThrownBy(() -> authService.register(registerRequest))
             .isInstanceOf(DuplicateResourceException.class)
             .hasMessageContaining("Email already exists");

@@ -11,7 +11,7 @@ import org.mapstruct.Mapping;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Mapper(componentModel = "spring", uses = {RoleMapper.class})
+@Mapper(componentModel = "spring")
 public interface GroupMapper {
 
     @Mapping(target = "users", expression = "java(mapUsers(group.getUsers()))")
@@ -19,7 +19,6 @@ public interface GroupMapper {
     GroupResponse toResponse(Group group);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "roles", ignore = true)
     @Mapping(target = "users", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)

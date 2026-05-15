@@ -12,16 +12,16 @@ import java.util.Optional;
 @Repository
 public interface GroupRepository extends JpaRepository<Group, Long> {
 
-    @Query("SELECT DISTINCT g FROM Group g LEFT JOIN FETCH g.roles WHERE g.id = :id")
-    Optional<Group> findByIdWithRoles(@Param("id") Long id);
+    @Query("SELECT DISTINCT g FROM Group g LEFT JOIN FETCH g.users WHERE g.id = :id")
+    Optional<Group> findByIdWithUsers(@Param("id") Long id);
 
-    @Query("SELECT DISTINCT g FROM Group g LEFT JOIN FETCH g.roles LEFT JOIN FETCH g.users WHERE g.id = :id")
-    Optional<Group> findByIdWithRolesAndUsers(@Param("id") Long id);
-
-    @Query("SELECT DISTINCT g FROM Group g LEFT JOIN FETCH g.roles LEFT JOIN FETCH g.users")
-    List<Group> findAllWithRolesAndUsers();
+    @Query("SELECT DISTINCT g FROM Group g LEFT JOIN FETCH g.users")
+    List<Group> findAllWithUsers();
 
     boolean existsByName(String name);
 
     Optional<Group> findByName(String name);
+
+    @Query("SELECT g.name FROM Group g JOIN g.users u WHERE u.id = :userId")
+    List<String> findGroupNamesByUserId(@org.springframework.data.repository.query.Param("userId") Long userId);
 }

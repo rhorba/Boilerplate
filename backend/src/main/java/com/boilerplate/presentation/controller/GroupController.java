@@ -26,7 +26,7 @@ public class GroupController {
     private final GroupService groupService;
 
     @GetMapping
-    @PreAuthorize("hasAuthority('SYSTEM_MANAGE')")
+    @PreAuthorize("@abacEvaluator.hasPermission(authentication, 'GROUP', 'MANAGE')")
     @Operation(summary = "Get all groups", description = "Retrieve list of all groups with roles and user counts")
     public ResponseEntity<List<GroupResponse>> getAllGroups() {
         List<GroupResponse> groups = groupService.getAllGroups();
@@ -34,7 +34,7 @@ public class GroupController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('SYSTEM_MANAGE')")
+    @PreAuthorize("@abacEvaluator.hasPermission(authentication, 'GROUP', 'MANAGE')")
     @Operation(summary = "Get group by ID", description = "Retrieve a specific group by its ID")
     public ResponseEntity<GroupResponse> getGroupById(@PathVariable Long id) {
         GroupResponse group = groupService.getGroupById(id);
@@ -42,7 +42,7 @@ public class GroupController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAuthority('SYSTEM_MANAGE')")
+    @PreAuthorize("@abacEvaluator.hasPermission(authentication, 'GROUP', 'MANAGE')")
     @Operation(summary = "Create new group", description = "Create a new group with optional role assignments")
     public ResponseEntity<GroupResponse> createGroup(@Valid @RequestBody GroupRequest request) {
         GroupResponse group = groupService.createGroup(request);
@@ -50,7 +50,7 @@ public class GroupController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('SYSTEM_MANAGE')")
+    @PreAuthorize("@abacEvaluator.hasPermission(authentication, 'GROUP', 'MANAGE')")
     @Operation(summary = "Update group", description = "Update an existing group's details and role assignments")
     public ResponseEntity<GroupResponse> updateGroup(
         @PathVariable Long id,
@@ -61,7 +61,7 @@ public class GroupController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('SYSTEM_MANAGE')")
+    @PreAuthorize("@abacEvaluator.hasPermission(authentication, 'GROUP', 'MANAGE')")
     @Operation(summary = "Delete group", description = "Delete a group (only if it has no users)")
     public ResponseEntity<Void> deleteGroup(@PathVariable Long id) {
         groupService.deleteGroup(id);
@@ -69,7 +69,7 @@ public class GroupController {
     }
 
     @PostMapping("/{id}/users")
-    @PreAuthorize("hasAuthority('SYSTEM_MANAGE')")
+    @PreAuthorize("@abacEvaluator.hasPermission(authentication, 'GROUP', 'MANAGE')")
     @Operation(summary = "Assign users to group", description = "Add multiple users to a group")
     public ResponseEntity<GroupResponse> assignUsers(
         @PathVariable Long id,
@@ -80,7 +80,7 @@ public class GroupController {
     }
 
     @DeleteMapping("/{groupId}/users/{userId}")
-    @PreAuthorize("hasAuthority('SYSTEM_MANAGE')")
+    @PreAuthorize("@abacEvaluator.hasPermission(authentication, 'GROUP', 'MANAGE')")
     @Operation(summary = "Remove user from group", description = "Remove a specific user from a group")
     public ResponseEntity<Void> removeUser(
         @PathVariable Long groupId,

@@ -3,8 +3,6 @@ package com.boilerplate.domain.model;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -29,15 +27,6 @@ public class Group extends BaseEntity {
 
     @Column(length = 255)
     private String description;
-
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-        name = "group_roles",
-        joinColumns = @JoinColumn(name = "group_id"),
-        inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
-    @lombok.Builder.Default
-    private Set<Role> roles = new HashSet<>();
 
     @ManyToMany(mappedBy = "groups", fetch = FetchType.LAZY)
     @lombok.Builder.Default

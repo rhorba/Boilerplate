@@ -52,4 +52,8 @@ public class User extends BaseEntity {
     )
     @Builder.Default
     private Set<Group> groups = new HashSet<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @Builder.Default
+    private Set<UserAttribute> attributes = new HashSet<>();
 }

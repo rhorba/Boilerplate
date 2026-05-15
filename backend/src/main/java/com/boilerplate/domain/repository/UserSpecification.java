@@ -4,6 +4,8 @@ import com.boilerplate.domain.model.User;
 import jakarta.persistence.criteria.JoinType;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.util.Locale;
+
 public final class UserSpecification {
 
     private UserSpecification() {
@@ -13,20 +15,20 @@ public final class UserSpecification {
         if (keyword == null || keyword.isBlank()) {
             return null;
         }
-        String pattern = "%" + keyword.toLowerCase() + "%";
+        String pattern = "%" + keyword.toLowerCase(Locale.ROOT) + "%";
         return (root, query, cb) -> cb.or(
             cb.like(cb.lower(root.get("username")), pattern),
             cb.like(cb.lower(root.get("email")), pattern)
         );
     }
 
-    public static Specification<User> hasRole(String roleName) {
-        if (roleName == null || roleName.isBlank()) {
+    public static Specification<User> hasGroup(String groupName) {
+        if (groupName == null || groupName.isBlank()) {
             return null;
         }
         return (root, query, cb) -> {
-            var rolesJoin = root.join("roles", JoinType.INNER);
-            return cb.equal(rolesJoin.get("name"), roleName);
+            var groupsJoin = root.join("groups", JoinType.INNER);
+            return cb.equal(groupsJoin.get("name"), groupName);
         };
     }
 

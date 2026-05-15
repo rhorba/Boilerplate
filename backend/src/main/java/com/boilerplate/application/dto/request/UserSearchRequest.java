@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class UserSearchRequest {
 
     private String search;
-    private String role;
+    private String group;
     private Boolean enabled;
     private Boolean showDeleted;
 }

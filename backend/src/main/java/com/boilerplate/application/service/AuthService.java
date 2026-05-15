@@ -52,7 +52,7 @@ public class AuthService {
             Boolean.TRUE.equals(request.getRememberMe())
         );
 
-        UserResponse userResponse = userRepository.findByUsernameWithRolesAndPermissions(request.getUsername())
+        UserResponse userResponse = userRepository.findByUsernameWithGroups(request.getUsername())
             .map(userMapper::toResponse)
             .orElseThrow(() -> new RuntimeException("User not found after authentication"));
 
@@ -87,7 +87,7 @@ public class AuthService {
 
         String newAccessToken = jwtService.generateAccessToken(userDetails);
 
-        UserResponse userResponse = userRepository.findByUsernameWithRolesAndPermissions(username)
+        UserResponse userResponse = userRepository.findByUsernameWithGroups(username)
             .map(userMapper::toResponse)
             .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -140,7 +140,7 @@ public class AuthService {
         String accessToken = jwtService.generateAccessToken(userDetails);
         String refreshToken = jwtService.generateRefreshToken(userDetails, false);
 
-        UserResponse userResponse = userRepository.findByUsernameWithRolesAndPermissions(request.getUsername())
+        UserResponse userResponse = userRepository.findByUsernameWithGroups(request.getUsername())
             .map(userMapper::toResponse)
             .orElseThrow(() -> new RuntimeException("User not found after registration"));
 

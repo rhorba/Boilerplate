@@ -1,0 +1,29 @@
+spring:
+  h2:
+    console:
+      enabled: false
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: none
+  flyway:
+    enabled: true
+
+# CORS — permissive for integration tests
+cors:
+  allowed-origins: http://localhost:4200
+  allowed-methods: GET,POST,PUT,PATCH,DELETE,OPTIONS
+  allowed-headers: "*"
+  allow-credentials: true
+
+# JWT — short-lived tokens for tests
+jwt:
+  secret: dGVzdC1zZWNyZXQta2V5LXRoYXQtaXMtbG9uZy1lbm91Z2gtZm9yLUhNQUMtU0hBLTI1Ng==
+  access-token-expiration: 900000
+  refresh-token-expiration: 2592000000
+  remember-me-expiration: 7776000000
+
+logging:
+  level:
+    com.boilerplate: WARN
+    org.springframework: WARN
